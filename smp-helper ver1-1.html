@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚑 Помощник инструктора СМП — Россия Онлайн</title>
+<style>
+:root{
+  --radius:16px;
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#0f1420; --bg2:#151c2e; --card:#1a2338; --card2:#212d47;
+  --text:#e8ecf5; --muted:#9aa7c4; --accent:#ff4d6d; --accent2:#3ea6ff;
+  --good:#3ddc97; --warn:#ffc24b; --bad:#ff6b6b;
+  --border:rgba(255,255,255,.08); --shadow:0 8px 24px rgba(0,0,0,.35);
+  --glass:rgba(255,77,109,.12);
+}
+[data-theme="light"]{
+  --bg:#f6f3ee; --bg2:#fffdfa; --card:#fffdfa; --card2:#f8f4ec;
+  --text:#2b2a33; --muted:#7a7568; --accent:#d63a5f; --accent2:#2f6fd0;
+  --good:#1f9d6c; --warn:#c98a12; --bad:#cf4a4a;
+  --border:rgba(90,80,60,.12); --shadow:0 6px 18px rgba(120,100,70,.10);
+  --glass:rgba(214,58,95,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(600px 300px at 85% -50px,var(--glass),transparent 70%),
+             radial-gradient(500px 260px at -10% 110%,rgba(62,166,255,.10),transparent 70%);}
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg2) 88%,transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 22px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header .logo{font-size:26px}
+header h1{font-size:19px;font-weight:800;letter-spacing:.3px}
+header h1 span{color:var(--accent)}
+header .sub{font-size:12px;color:var(--muted);width:100%;margin-top:-6px}
+#clock{margin-left:auto;text-align:right;font-size:12px;color:var(--muted);line-height:1.5}
+#clock b{color:var(--text);font-size:14px}
+#shiftBadge{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:700;font-size:11px}
+#shiftBadge.day{background:rgba(255,194,75,.18);color:var(--warn)}
+#shiftBadge.night{background:rgba(62,166,255,.18);color:var(--accent2)}
+#shiftBadge.lunch{background:rgba(61,220,151,.18);color:var(--good)}
+#themeBtn{margin-left:12px;border:1px solid var(--border);background:var(--card);color:var(--text);
+  border-radius:999px;padding:8px 14px;font-size:15px;cursor:pointer;transition:.2s;box-shadow:var(--shadow)}
+#themeBtn:hover{transform:scale(1.07)}
+nav{position:sticky;top:74px;z-index:40;display:flex;gap:8px;overflow-x:auto;padding:12px 22px;
+  background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+nav::-webkit-scrollbar{height:0}
+.tab-btn{border:1px solid var(--border);background:var(--card);color:var(--muted);border-radius:999px;
+  padding:9px 16px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.2s}
+.tab-btn:hover{color:var(--text);transform:translateY(-1px)}
+.tab-btn.active{background:linear-gradient(135deg,var(--accent),#ff7a59);color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(255,77,109,.35)}
+main{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:24px 22px 80px}
+.tab-pane{display:none;animation:fade .25s ease}
+.tab-pane.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.grid{display:grid;gap:16px}
+.grid.c2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.grid.c3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;box-shadow:var(--shadow)}
+.card h2{font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h3{font-size:14px;margin:14px 0 8px;color:var(--accent)}
+.card p,.card li{font-size:13.5px;line-height:1.65;color:var(--text)}
+.card ul,.card ol{padding-left:20px;display:grid;gap:5px}
+.muted{color:var(--muted);font-size:12.5px}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11.5px;font-weight:700;background:var(--glass);color:var(--accent);margin:2px 2px}
+.pill.blue{background:rgba(62,166,255,.14);color:var(--accent2)}
+.pill.green{background:rgba(61,220,151,.14);color:var(--good)}
+.pill.warn{background:rgba(255,194,75,.15);color:var(--warn)}
+.hero{background:linear-gradient(135deg,#ff4d6d,#ff7a59);border-radius:var(--radius);padding:26px;color:#fff;box-shadow:0 10px 30px rgba(255,77,109,.35)}
+.hero h2{font-size:22px;margin-bottom:6px}
+.hero p{font-size:13.5px;opacity:.92;line-height:1.6}
+details{background:var(--card2);border:1px solid var(--border);border-radius:12px;margin:8px 0;overflow:hidden}
+details summary{cursor:pointer;padding:12px 16px;font-size:13.5px;font-weight:700;list-style:none;display:flex;gap:8px;align-items:center;transition:.15s}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"❓";flex-shrink:0}
+details[open] summary{background:var(--glass);color:var(--accent)}
+details .ans{padding:12px 16px 14px;font-size:13.5px;line-height:1.7;border-top:1px dashed var(--border)}
+.ans b{color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px}
+td b{color:var(--accent)}
+.calc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed var(--border)}
+.calc-row:last-child{border-bottom:none}
+.calc-row label{font-size:13.5px;display:flex;align-items:center;gap:8px;flex:1}
+.calc-row .pts{font-size:11px;color:var(--muted);white-space:nowrap}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:16px;font-weight:800;cursor:pointer;transition:.15s}
+.stepper button:hover{background:var(--accent);color:#fff;border-color:transparent}
+.stepper input{width:56px;text-align:center;padding:6px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:14px;font-weight:700;font-family:var(--font)}
+.total-bar{margin-top:16px;padding:16px;border-radius:14px;background:var(--glass);border:1px solid var(--border)}
+.total-bar .big{font-size:30px;font-weight:900;color:var(--accent)}
+.progress{height:10px;border-radius:999px;background:var(--card2);overflow:hidden;margin-top:8px;border:1px solid var(--border)}
+.progress i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),#ff7a59);transition:width .4s}
+select,input[type=text]{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13.5px;font-family:var(--font)}
+.chk{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;font-size:13.5px;transition:.15s;border:1px solid transparent}
+.chk:hover{background:var(--card2)}
+.chk input{accent-color:var(--accent);width:17px;height:17px}
+.chk.done{opacity:.55;text-decoration:line-through}
+.req-ok{color:var(--good);font-weight:800}
+.req-no{color:var(--bad);font-weight:800}
+a.link{color:var(--accent2);text-decoration:none;font-weight:600}
+a.link:hover{text-decoration:underline}
+.linkcard{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:12px;background:var(--card2);border:1px solid var(--border);text-decoration:none;color:var(--text);transition:.18s;font-size:13.5px}
+.linkcard:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:var(--shadow)}
+.linkcard .ic{font-size:20px}
+.linkcard small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.note{border-left:3px solid var(--warn);background:rgba(255,194,75,.08);padding:10px 14px;border-radius:0 10px 10px 0;font-size:13px;margin:10px 0}
+.note.red{border-color:var(--bad);background:rgba(255,107,107,.08)}
+.note.green{border-color:var(--good);background:rgba(61,220,151,.08)}
+.copy-btn{border:1px solid var(--border);background:var(--card2);color:var(--text);border-radius:8px;padding:4px 10px;font-size:11.5px;cursor:pointer;transition:.15s}
+.copy-btn:hover{background:var(--accent);color:#fff}
+.vesh-row{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--card2);border:1px solid var(--border);margin:8px 0}
+.vesh-row .time{font-weight:900;color:var(--accent);min-width:52px;font-size:14px}
+.vesh-row .txt{flex:1;font-size:13.5px;line-height:1.55}
+.search{width:100%;padding:11px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;margin-bottom:14px;font-family:var(--font)}
+.badge-rank{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;padding:0 8px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ff7a59);color:#fff;font-weight:900;font-size:13px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;position:relative;z-index:1}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:999px;padding:10px 22px;font-size:13.5px;box-shadow:var(--shadow);opacity:0;transition:.3s;z-index:99}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+/* Шпаргалка: открытые ответы мелким шрифтом */
+.qa details summary{font-size:13px;padding:10px 14px}
+.qa details .ans{font-size:12px;line-height:1.6;color:var(--muted)}
+.qa details .ans b{color:var(--accent)}
+/* Широкая шпаргалка */
+main:has(#tab-exam.active){max-width:1500px}
+main:has(#tab-ustav.active){max-width:1500px}
+main:has(#tab-pgo.active){max-width:1500px}
+/* Кликабельные ссылки на главы устава */
+.uref{color:var(--accent2);cursor:pointer;text-decoration:underline dotted;font-weight:700}
+.uref:hover{color:var(--accent)}
+/* Строки калькулятора замен */
+.sub-row .zres{min-width:118px;text-align:right;font-size:12px}
+/* Устав */
+.ustav-wrap{display:grid;grid-template-columns:250px 1fr;gap:16px;align-items:start}
+.ustav-nav{position:sticky;top:140px;display:grid;gap:4px}
+.ustav-nav a{display:block;padding:7px 12px;border-radius:9px;font-size:12.5px;color:var(--muted);text-decoration:none;border:1px solid transparent;transition:.15s}
+.ustav-nav a:hover{background:var(--card2);color:var(--text)}
+.ustav-nav a.active{background:var(--glass);color:var(--accent);font-weight:700}
+.ustav-body h3{font-size:16px;margin:22px 0 8px;color:var(--accent);scroll-margin-top:150px;display:flex;align-items:center;gap:8px}
+.ustav-body h3:first-child{margin-top:0}
+.ustav-body p{font-size:12.5px;line-height:1.65;margin:5px 0;color:var(--text)}
+.ustav-body p.note-u{color:var(--muted);font-size:12px;padding-left:14px;border-left:2px solid var(--border)}
+.ustav-body p b{color:var(--accent)}
+@media(max-width:900px){.ustav-wrap{grid-template-columns:1fr}.ustav-nav{position:static;grid-template-columns:1fr 1fr}}
+@media(max-width:640px){header h1{font-size:16px}nav{top:118px}}
+/* Пропорциональное укрупнение шрифтов */
+.card p,.card li{font-size:14.5px}
+details summary{font-size:14.5px}
+details .ans{font-size:14.5px}
+.qa details summary{font-size:14px}
+.qa details .ans{font-size:13px}
+table{font-size:14px}
+th{font-size:12.5px}
+.calc-row label{font-size:14.5px}
+.calc-row .pts{font-size:12px}
+.muted{font-size:13.5px}
+.tab-btn{font-size:14.5px}
+.vesh-row .txt{font-size:14.5px}
+.chk{font-size:14.5px}
+.note{font-size:14px}
+.linkcard{font-size:14.5px}
+.ustav-body p{font-size:13.5px}
+.ustav-body p.note-u{font-size:13px}
+.sub-row .zres{font-size:13px}
+footer{font-size:13px}
+/* Быстрые кнопки ответов по отчёту */
+.qbtns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.qbtn{border:1px solid var(--border);background:var(--card2);color:var(--text);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer;transition:.15s;font-family:var(--font)}
+.qbtn:hover{background:var(--bad);color:#fff;border-color:transparent;transform:translateY(-1px)}
+.qbtn.good:hover{background:var(--good)}
+.qbtn.verd{font-weight:800;font-size:14px;padding:10px 18px}
+.qbtn.verd-ok:hover{background:var(--good)}
+.qbtn.verd-bad:hover{background:var(--bad)}
+/* Кликабельный список экзаменов */
+.exnav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.exnav a{border:1px solid var(--border);background:var(--card);color:var(--muted);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:.2s;white-space:nowrap}
+.exnav a:hover{background:linear-gradient(135deg,var(--accent),#ff7a59);color:#fff;border-color:transparent;transform:translateY(-1px)}
+#tab-exam .card{scroll-margin-top:150px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🚑</div>
+  <div>
+    <h1>Помощник инструктора <span>СМП</span></h1>
+    <div class="sub">Больница · Россия Онлайн · Тверской — всё для работы инструктора в одном месте</div>
+  </div>
+  <div id="clock">
+    <b id="clockTime">--:--</b><br>
+    <span id="shiftBadge" class="day">☀️ Дневная смена</span>
+  </div>
+  <button id="themeBtn" title="Сменить тему">🌙 Ночь</button>
+</header>
+
+<nav id="tabs">
+  <button class="tab-btn active" data-tab="home">🏠 Главная</button>
+  <button class="tab-btn" data-tab="calc">🧮 Калькулятор</button>
+  <button class="tab-btn" data-tab="exam">🎓 Шпаргалка экзаменов</button>
+  <button class="tab-btn" data-tab="report">📋 Отчёты</button>
+  <button class="tab-btn" data-tab="rules">📜 Регламент и правила</button>
+  <button class="tab-btn" data-tab="ustav">⚖️ Устав Больницы</button>
+  <button class="tab-btn" data-tab="pgo">🏛 Правила госорганизаций</button>
+  <button class="tab-btn" data-tab="vesh">📣 Вещание</button>
+  <button class="tab-btn" data-tab="quests">🎯 Квесты</button>
+  <button class="tab-btn" data-tab="links">🔗 Ссылки</button>
+</nav>
+
+<main>
+<!-- ======================= ГЛАВНАЯ ======================= -->
+<section class="tab-pane active" id="tab-home">
+  <div class="hero">
+    <h2>👋 Привет, инструктор!</h2>
+    <p>Твой рабочий помощник: калькулятор баллов, шпаргалки ко всем экзаменам, регламент отчётов, вещания и правила проекта. Всё собрано из официальных каналов отдела СМП и форума Россия Онлайн.</p>
+  </div>
+  <div class="grid c3" style="margin-top:16px">
+    <div class="card">
+      <h2>🕐 Смены</h2>
+      <table>
+        <tr><td>☀️ День Пн–Пт</td><td><b>10:00–22:00</b></td></tr>
+        <tr><td>☀️ День Сб–Вс</td><td><b>11:00–22:00</b></td></tr>
+        <tr><td>🌙 Ночь Пн–Пт</td><td><b>22:00–10:00</b></td></tr>
+        <tr><td>🌙 Ночь Сб–Вс</td><td><b>22:00–11:00</b></td></tr>
+        <tr><td>🍽 Обед</td><td><b>14:00–15:00</b> <span class="pill green">×2 балла</span></td></tr>
+      </table>
+      <p class="muted">Ночная смена необязательна. Максимум 12 часов в сутки. Работа в обед — двойные баллы (прикреплять в «Доп. баллы»).</p>
+    </div>
+    <div class="card">
+      <h2>⚡ Быстрые цифры</h2>
+      <ul>
+        <li>📈 Недельный отчёт: <b>300 баллов</b> (средний состав), <b>400</b> (инструкторы, из них <b>200+</b> инструкторской)</li>
+        <li>🗓 Сдача отчёта: <b>Чт 00:00 — Сб 23:59</b></li>
+        <li>⬆️ Повышение: <b>1 ранг в сутки</b></li>
+        <li>💊 Склад: парацетамол 48 · эпинефрин 20 · уголь 24 · азитромицин 24 · ИРП 3</li>
+        <li>📝 Вступительный тест: <b>16/20</b> для прохождения</li>
+        <li>📣 Вещание: <b>макс 2 в сутки</b>, 5 баллов каждое</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>👔 Руководство отдела</h2>
+      <ul>
+        <li>⭐ Зав.СМП — Даниил Быков | 11395</li>
+        <li>🔸 З.З.СМП — Владимир Быков | 19787</li>
+        <li>🔸 З.З.СМП — Евгений Добродеев | 57430</li>
+        <li>🔸 З.З.СМП — Руфат Маликов | 88257</li>
+      </ul>
+      <p class="muted" style="margin-top:8px">Вопросы — по иерархии: Инструктор → З.З.СМП → Зав.СМП → старший состав АБ → Зав. больницей → ЗГВ → ГВ.</p>
+    </div>
+  </div>
+  <div class="grid c2" style="margin-top:16px">
+    <div class="card">
+      <h2>🩺 Что умеет этот помощник</h2>
+      <ul>
+        <li>🧮 <b>Калькулятор</b> — считает баллы за любую работу, проверяет норму недельника и готовность к повышению, помогает с заменами</li>
+        <li>🎓 <b>Шпаргалка</b> — вопросы и ответы ко всем устным экзаменам (3→4 … 8→9) по официальным лекциям</li>
+        <li>📋 <b>Отчёты</b> — регламент заполнения, требования к скриншотам, чек-лист проверки чужого отчёта</li>
+        <li>📜 <b>Регламент</b> — ключевые пункты регламента СМП и Устава Больницы, дресс-код, отработки</li>
+        <li>📣 <b>Вещание</b> — все тексты вещаний по часам с кнопкой копирования</li>
+        <li>🎯 <b>Квесты</b> — актуальный список квестов и наград</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>⏰ Дедлайны повышений (<span class="uref" data-u="u3">Устав 3.6.1</span>)</h2>
+      <table>
+        <tr><th>Переход</th><th>Срок подачи</th></tr>
+        <tr><td><span class="badge-rank">1→2</span></td><td>24 часа</td></tr>
+        <tr><td><span class="badge-rank">2→3</span></td><td>48 часов</td></tr>
+        <tr><td><span class="badge-rank">3→4</span></td><td>72 часа</td></tr>
+        <tr><td><span class="badge-rank">4→5</span></td><td>96 часов</td></tr>
+        <tr><td><span class="badge-rank">5→6</span></td><td>144 часа</td></tr>
+        <tr><td><span class="badge-rank">6→7</span></td><td>192 часа</td></tr>
+        <tr><td><span class="badge-rank">7→8</span></td><td>240 часов</td></tr>
+        <tr><td><span class="badge-rank">8→9</span></td><td>312 часов</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+<!-- ======================= КАЛЬКУЛЯТОР ======================= -->
+<section class="tab-pane" id="tab-calc">
+  <div class="grid c2">
+    <div class="card">
+      <h2>🧮 Баллы за работу</h2>
+      <h3>🚑 ПМП</h3>
+      <div class="calc-row"><label>☀️ ПМП день (10:00–22:00)</label><span class="pts">3 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="3" id="c_pmpD"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>🌙 ПМП ночь (22:00–10:00)</label><span class="pts">5 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="5" id="c_pmpN"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>🏥 ПМП в больнице</label><span class="pts">1 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="1" id="c_pmpH"><button data-d="1">+</button></div></div>
+      <h3>🎓 Практические ПМП (с 7 ранга)</h3>
+      <div class="calc-row"><label>☀️ Практика день</label><span class="pts">5 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="5" id="c_prD"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>🌙 Практика ночь</label><span class="pts">7 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="7" id="c_prN"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>🚫 Отменённый вызов</label><span class="pts">1 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="1" id="c_cancel"><button data-d="1">+</button></div></div>
+      <h3>💊 Таблетки</h3>
+      <div class="calc-row"><label>🏥 ГКБ №1</label><span class="pts">1 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="1" id="c_tab1"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>🏥 ГКБ №2 Склиф</label><span class="pts">2 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="2" id="c_tab2"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>🚑 Мед.отсек АСМП</label><span class="pts">2 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="2" id="c_tabA"><button data-d="1">+</button></div></div>
+      <h3>💉 Вакцины и справки</h3>
+      <div class="calc-row"><label>💉 Вакцина ГКБ №2 Склиф</label><span class="pts">2 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="2" id="c_vak2"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>💉 Вакцина ГКБ №1</label><span class="pts">3 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="3" id="c_vak1"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>🚑 Вакцина в АСМП</label><span class="pts">3 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="3" id="c_vakA"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>📄 Медсправка (Склиф)</label><span class="pts">2 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="2" id="c_spr"><button data-d="1">+</button></div></div>
+      <h3>🏅 Прочее</h3>
+      <div class="calc-row"><label>🎖 Получение квалификации</label><span class="pts">50 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="50" id="c_kval"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>🛠 Работа по RP-квалификации</label><span class="pts">50 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="50" id="c_rp"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>✍️ Трудовой договор</label><span class="pts">20 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="20" id="c_dog"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>❌ Отказ в трудоустройстве</label><span class="pts">10 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="10" id="c_otk"><button data-d="1">+</button></div></div>
+      <h3>👨‍🏫 Инструкторская работа</h3>
+      <div class="calc-row"><label>🔍 Проверка отчёта</label><span class="pts">10 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="10" data-inst="1" id="c_chk"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>🎤 Проведение экзамена</label><span class="pts">5 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="5" data-inst="1" id="c_exam"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>📣 Вещание</label><span class="pts">5 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="5" data-inst="1" id="c_vesh"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>👀 Проверка дежурств</label><span class="pts">10 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="10" data-inst="1" id="c_dej"><button data-d="1">+</button></div></div>
+      <div class="calc-row"><label>🍽 ПМП в обед (×2, в «Доп. баллы»)</label><span class="pts">6 б.</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0" data-pts="6" id="c_lunch"><button data-d="1">+</button></div></div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>📊 Итог</h2>
+        <div class="total-bar">
+          <div style="font-size:12.5px;color:var(--muted)">Всего баллов</div>
+          <div class="big" id="totalPts">0</div>
+          <div class="muted" id="instPts">👨‍🏫 из них инструкторских: 0</div>
+        </div>
+        <h3>🎯 Норма недельного отчёта</h3>
+        <select id="normSel" style="width:100%">
+          <option value="300">🧑‍⚕️ Средний состав — 300 баллов</option>
+          <option value="400">👨‍🏫 Инструктор — 400 баллов (мин. 200 инстр.)</option>
+        </select>
+        <div class="progress" style="margin-top:12px"><i id="normBar" style="width:0%"></i></div>
+        <p class="muted" id="normText" style="margin-top:8px">До нормы: 300 баллов</p>
+        <p class="muted" id="instWarn"></p>
+        <button class="copy-btn" id="resetCalc" style="margin-top:10px">🗑 Сбросить всё</button>
+        <button class="copy-btn" id="copyRes" style="margin-top:10px;margin-left:8px">📋 Скопировать итог</button>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>⬆️ Проверка на повышение</h2>
+        <select id="rankSel" style="width:100%">
+          <option value="0">3 → 4 · 40 ПМП · экзамен ПМП+Вакцинация + тест</option>
+          <option value="1">4 → 5 · 50 ПМП · 5 вакцин · 200 б.</option>
+          <option value="2">5 → 6 · 60 ПМП · 10 вакцин · 300 б.</option>
+          <option value="3">6 → 7 · 70 ПМП · 15 вакцин · 400 б.</option>
+          <option value="4">7 → 8 · 80 ПМП · 20 вакцин · 500 б.</option>
+          <option value="5">8 → 9 · 100 ПМП · 25 вакцин · 600 б.</option>
+        </select>
+        <div id="rankCheck" style="margin-top:12px;font-size:13.5px;line-height:2"></div>
+        <p class="muted">Считается по полям калькулятора слева: ПМП = день + ночь (ПМП в больнице и практика не идут в норму ПМП), вакцины = все вакцины, баллы = итог.</p>
+        <div class="note">⚠️ 1 повышение в сутки. При активном выговоре — только после снятия. Учитывается работа только после предыдущего отчёта на повышение.</div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>🔄 Калькулятор замен</h2>
+        <p class="muted" style="margin-bottom:10px">Введи, сколько «лишней» работы отдаёшь в замену — баллы сразу добавляются в общий итог, а лимит 50% проверяется автоматически.</p>
+        <div class="calc-row sub-row" data-rate="1" data-target="pmp" data-from="💉 вакцин" data-to="ПМП"><label>💉 Вакцина → 🚑 ПМП</label><span class="pts">1 : 1</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0"><button data-d="1">+</button></div><span class="zres muted">→ 0 ПМП</span></div>
+        <div class="calc-row sub-row" data-rate="5" data-target="vak" data-from="🚑 ПМП" data-to="вакцин"><label>🚑 ПМП → 💉 Вакцина</label><span class="pts">5 : 1</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0"><button data-d="1">+</button></div><span class="zres muted">→ 0 вакц.</span></div>
+        <div class="calc-row sub-row" data-rate="4" data-target="vak" data-from="📄 медсправок" data-to="вакцин"><label>📄 Медсправки → 💉 Вакцина</label><span class="pts">4 : 1</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0"><button data-d="1">+</button></div><span class="zres muted">→ 0 вакц.</span></div>
+        <div class="calc-row sub-row" data-rate="2" data-target="pmp" data-from="📄 медсправок" data-to="ПМП"><label>📄 Медсправки → 🚑 ПМП</label><span class="pts">2 : 1</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0"><button data-d="1">+</button></div><span class="zres muted">→ 0 ПМП</span></div>
+        <div class="calc-row sub-row" data-rate="5" data-target="pmp" data-from="💊 таблеток" data-to="ПМП"><label>💊 Таблетки → 🚑 ПМП</label><span class="pts">5 : 1</span><div class="stepper"><button data-d="-1">−</button><input type="text" inputmode="numeric" value="0"><button data-d="1">+</button></div><span class="zres muted">→ 0 ПМП</span></div>
+        <div id="zamWarn" style="margin-top:10px;font-size:12.5px;line-height:1.8"></div>
+        <h3 style="margin-top:16px">📐 Таблица замен (макс 50% от нормы)</h3>
+        <table>
+          <tr><th>Меняем</th><th>На</th><th>Лимит</th></tr>
+          <tr><td>1 вакцина</td><td>→ 1 ПМП (3 б.)</td><td>до 50% ПМП</td></tr>
+          <tr><td>5 ПМП</td><td>→ 1 вакцина (3 б.)</td><td>до 50% вакцин</td></tr>
+          <tr><td>4 медсправки</td><td>→ 1 вакцина (3 б.)</td><td>до 50% вакцин</td></tr>
+          <tr><td>2 медсправки</td><td>→ 1 ПМП (3 б.)</td><td>до 50% ПМП</td></tr>
+          <tr><td>5 таблеток</td><td>→ 1 ПМП (3 б.)</td><td>до 50% ПМП</td></tr>
+        </table>
+        <div class="note red">⛔ Замены работают только в одном направлении — «что сделали → на что меняете». Обязательно указывать в отчёте что, на что и сколько меняете.</div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>⚡ Быстрые ответы по отчёту</h2>
+        <p class="muted" style="margin-bottom:10px">Нажми на кнопку — готовый текст замечания скопируется в буфер, остаётся вставить в ответ сотруднику.</p>
+        <h3>❌ Причины непринятия</h3>
+        <div class="qbtns">
+          <button class="qbtn" data-copy="❌ Отчёт не принят: не хватает баллов до недельной нормы. Доберите работу и пересдайте отчёт.">📉 Не хватает баллов</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: на скриншотах нет плашки бодикамеры с горящим красным индикатором. Скрины без бодикамеры не засчитываются.">🎥 Бодикамера выключена</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: на скриншотах не видно даты и времени. Переснимите с видимыми датой и временем.">🕐 Нет даты/времени</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: скриншоты должны быть полноэкранными, со статиком и сервером.">🖥 Не полный экран</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: ссылки с запрещённого фотохостинга. Используйте разрешённый хостинг из регламента.">🔗 Фотохостинг</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: не указано количество скриншотов в скобках ( ).">🔢 Нет скобок</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: содержимое ссылок не соответствует названию графы.">📂 Графа ≠ содержимое</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: ПМП в больнице посчитаны в общую норму ПМП. Они выносятся отдельной строкой (1 балл).">🏥 ПМП в больнице</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: работа в обеденный перерыв прикрепляется отдельной папкой в графу «Доп. баллы» (учитывается ×2).">🍽 Обед не в «Доп. баллы»</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: замены превышают 50% от нормы или не указано, что, на что и сколько меняется.">🔄 Замены >50%</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: баллы посчитаны неверно. Пересчитайте по системе баллов отдела.">🧮 Ошибка в баллах</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: работа выполнена до предыдущего отчёта. Учитывается только работа после него.">📅 Старая работа</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: пустые графы должны оставаться пустыми — без прочерков и нулей.">✍️ Прочерки в графах</button>
+          <button class="qbtn" data-copy="❌ Отчёт не принят: обнаружены признаки фиктивной деятельности (п. 4.14).">🕵️ Фиктивная работа</button>
+        </div>
+        <h3>✅ Хорошие результаты</h3>
+        <div class="qbtns">
+          <button class="qbtn good" data-copy="✅ Скриншоты оформлены идеально: полный экран, дата и время, бодикамера. Так держать!">📸 Скрины идеальны</button>
+          <button class="qbtn good" data-copy="🏆 Недельная норма перевыполнена — отличная работа!">🏆 Норма перевыполнена</button>
+          <button class="qbtn good" data-copy="✅ Баллы посчитаны верно, замечаний нет.">🧮 Расчёт верен</button>
+          <button class="qbtn good" data-copy="🔥 Высокая активность на этой неделе, молодец!">🔥 Высокая активность</button>
+          <button class="qbtn good" data-copy="👍 Отчёт оформлен аккуратно и строго по форме.">👍 Аккуратное оформление</button>
+        </div>
+        <h3>📝 Вердикт</h3>
+        <div class="qbtns">
+          <button class="qbtn verd verd-ok" data-copy="✅ Отчёт принят. Отличная работа, так держать!">✅ Принят</button>
+          <button class="qbtn verd verd-bad" data-copy="❌ Отчёт не принят. Исправьте замечания и пересдайте до 23:59 субботы.">❌ Не принят</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ======================= ШПАРГАЛКА ЭКЗАМЕНОВ ======================= -->
+<section class="tab-pane" id="tab-exam">
+  <input class="search" id="examSearch" placeholder="🔍 Поиск по вопросам и ответам… (например: адреналин, СГУ, холера)">
+  <div class="exnav">
+    <a href="#ex0">📌 Как проходят</a>
+    <a href="#ex1">🚑 3→4 · ПМП и вакцинация</a>
+    <a href="#ex2">💊 4→5 · Фармакология</a>
+    <a href="#ex3">☣️ 5→6 · ООИ</a>
+    <a href="#ex4">❤️‍🩹 6→7 · Реаниматология</a>
+    <a href="#ex5">🧠 7→8 · Неврология</a>
+    <a href="#ex6">🦴 8→9 · Травматология</a>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <h2>📌 Как проходят экзамены</h2>
+    <ul>
+      <li>📋 Запись на экзамен — канал <b>┃📋・запись-на-экзамен</b>; в отчёт прикрепляется ссылка на запись с галочкой проводящего</li>
+      <li>📍 Вступительный тест (для 3→4) — бот в канале <b>┃📍・вступительный-тест</b>: 20 вопросов, проходной порог <b>16 баллов</b></li>
+      <li>🎤 Экзамены устные, по лекциям ниже; проведение экзамена = <b>5 баллов</b> инструктору</li>
+      <li>⛔ Две попытки на теор. экзамены младшего состава (Интерн→Санитар, Санитар→Лаборант), иначе — увольнение с ЧС (Устав 5.20)</li>
+    </ul>
+  </div>
+
+  <div class="grid" style="grid-template-columns:1fr">
+    <div class="card qa">
+      <h2><span class="badge-rank">3→4</span> 🚑 ПМП + 💉 Вакцинация</h2>
+      <details><summary>С какого ранга выполняется ПМП?</summary><div class="ans">С <b>3 ранга</b> (Лаборант) и выше.</div></details>
+      <details><summary>Что запрещено при оказании ПМП?</summary><div class="ans">⛔ Оказывать ПМП <b>в зоне перестрелок</b>; ⛔ если вам <b>угрожают оружием</b>; ⛔ <b>поднимать гражданских до госсотрудника</b>; ⛔ оказывать ПМП <b>без дефибриллятора</b>; ⛔ на <b>закрытых территориях без сопровождения</b>.</div></details>
+      <details><summary>Что разрешено при ПМП?</summary><div class="ans">✅ Заехать в магазин/банк <b>при отсутствии вызовов</b>; ✅ <b>отменить вызов при угрозе жизни</b>.</div></details>
+      <details><summary>Приехал на вызов — пострадавшего нет. Действия?</summary><div class="ans">Написать в репорт: <b>«Здравствуйте, приехал(а) на вызов, не вижу пострадавшего»</b>.</div></details>
+      <details><summary>Кому оказываем помощь в первую очередь?</summary><div class="ans"><b>Госсотрудникам силовых структур</b>, далее — сотрудникам прочих госструктур, в последнюю очередь — гражданским (регл. 2.18).</div></details>
+      <details><summary>Закончились эпинефрины на вызове — что делать?</summary><div class="ans">Сделать вызов скорой помощи <b>через телефон (103)</b>, сообщить в рацию, что закончились «эпики», и попросить коллег принять вызов.</div></details>
+      <details><summary>Как берётся ПМП (порядок)?</summary><div class="ans">1️⃣ Пополнить медикаменты быстрыми наборами → 2️⃣ заспавнить транспорт через планшет → 3️⃣ (по желанию) «В патруле» → 4️⃣ взять вызов → 5️⃣ маршрут → 6️⃣ убедиться в безопасности → 7️⃣ G → «Реанимировать» → мини-игра → 8️⃣ скриншот с плашкой «Вы реанимировали…».</div></details>
+      <details><summary>Что должно быть на скриншоте ПМП?</summary><div class="ans">Уведомление о реанимации, <b>дата и время</b>, <b>статик и сервер</b>, дресс-код отдела, <b>плашка бодикамеры с горящим красным индикатором</b>. Иначе скрин не принимается.</div></details>
+      <details><summary>Парковка АСМП после патруля — требования?</summary><div class="ans">Парковка больницы, предварительно <b>отремонтировать</b>, оставить <b>40+ литров</b> в баке, <b>закрыть</b>, выключить спецсигналы, <b>заглушить</b> двигатель.</div></details>
+      <details><summary>Режимы СГУ и горячие клавиши?</summary><div class="ans">Включение панели — <b>POWER / Alt+G</b>. Режимы: <b>Standby (Alt+1)</b> — беззвучный; <b>Wail (Alt+2), Yelp (Alt+3), Hilo (Alt+4)</b> — сирены. «Крякалка» — <b>E / HORN</b>. Вручную — <b>MAN</b>. Сирена и маячки — только на вызове, по завершении — выключить.</div></details>
+      <details><summary>Практика по ПМП: кто и как проводит?</summary><div class="ans">Только с <b>7 ранга</b>, для <b>Санитаров (2 ранг)</b>. Санитару нужно <b>5 ПМП</b> с вами. Он обязан включить бодикамеру и стоять рядом, чтобы попадать в кадр. Награда: <b>5 б. днём / 7 б. ночью</b> за вызов. Максимум 5 скринов с одним санитаром. Запрещено: ПМП в больнице, практика ниже 7 ранга, практика интернам.</div></details>
+      <details><summary>С какого ранга выполняется вакцинация?</summary><div class="ans">С <b>4 ранга</b>. Приоритет — у сотрудников СМП на дежурстве в больнице.</div></details>
+      <details><summary>Какие препараты нужны для вакцинации?</summary><div class="ans"><b>Азитромицин</b> — 1 упаковка (24 шт), лечение простудных заболеваний; <b>Активированный уголь</b> — 1 упаковка (24 шт), лечение отравлений.</div></details>
+      <details><summary>Сколько стоит вакцина и кому бесплатно?</summary><div class="ans"><b>4 000 ₽</b>. Сотрудникам Больницы — <b>бесплатно</b> (просим удостоверение, если сомневаемся). Свою цену и скидки ставить <b>запрещено</b>.</div></details>
+      <details><summary>Где разрешено вакцинировать в ГКБ №1?</summary><div class="ans">1 этаж: <b>операционный блок</b> (правое крыло), <b>кабинеты Терапевта</b> (левое крыло); при сильной нагрузке — 2 этаж, кабинеты Терапевта.</div></details>
+      <details><summary>Где разрешено вакцинировать в ГКБ №2 (Склиф)?</summary><div class="ans">1 этаж: операционные <b>№1/№2</b> (синяя пунктирная линия), кабинет <b>Скорая Помощь</b> — задняя регистратура (красная линия); при нагрузке — 2 этаж: Кардиолог, Педиатр, МРТ.</div></details>
+      <details><summary>Вакцинация в мед.отсеке АСМП — порядок?</summary><div class="ans">Открыть багажник АСМП → войти с пациентом через <b>боковую дверь</b> → закрыть дверь → вакцинировать в мед.отсеке. Если не получается зайти — допустимо вакцинировать <b>рядом с боковой дверью</b>.</div></details>
+      <details><summary>Порядок вакцинации в кабинете?</summary><div class="ans">1️⃣ Попросить снять верхнюю одежду → 2️⃣ G → Фракционное → <b>Диагностировать болезнь</b> → 3️⃣ сообщить диагноз и попросить <b>4 000 ₽</b> → 4️⃣ G → Фракционное → <b>Вакцинировать</b> → 5️⃣ мини-игра с колбочками → 6️⃣ скриншот с системным сообщением.</div></details>
+      <details><summary>Кто может находиться в кабинете при вакцинации?</summary><div class="ans">Только <b>вы и пациент</b>. Исключение: администрация больницы, старший состав ПСЭС, ЗГВ/ГВ.</div></details>
+    </div>
+
+    <div class="card qa">
+      <h2><span class="badge-rank">4→5</span> 💊 Фармакология и токсикология</h2>
+      <details><summary>Адреналин (Эпинефрин) — действие и показания?</summary><div class="ans">Действие: <b>сосудосуживающее, противоаллергическое</b>. Показания: <b>клиническая смерть, анафилактический шок</b>.</div></details>
+      <details><summary>Атропин — действие и показания?</summary><div class="ans"><b>Учащает ЧСС</b>. Показания: <b>брадикардия</b> (уреженная ЧСС).</div></details>
+      <details><summary>Аспирин — действие и показания?</summary><div class="ans"><b>Кроверазжижающее</b>. Показания: <b>сжимающая боль за грудиной</b>.</div></details>
+      <details><summary>Нитроглицерин — действие и показания?</summary><div class="ans"><b>Сосудорасширяющее</b>. Показания: <b>сжимающая боль за грудиной</b>. Вводится <b>сублингвально</b> (под язык).</div></details>
+      <details><summary>Глюкоза — показания?</summary><div class="ans">Повышает уровень глюкозы в крови. Показания: <b>гипогликемия</b> (низкий уровень глюкозы).</div></details>
+      <details><summary>Налоксон — что это?</summary><div class="ans"><b>Антидот опиатов</b>. Показания: отравление опиатами.</div></details>
+      <details><summary>Активированный уголь и Азитромицин?</summary><div class="ans">Уголь — <b>адсорбент</b>, отравления (1 г на 1 кг веса). Азитромицин — <b>антибактериальное</b>, бактериальные инфекции.</div></details>
+      <details><summary>Пути введения препаратов (от быстрого к медленному)?</summary><div class="ans">💉 <b>Внутривенно</b> — самый быстрый; 👅 <b>сублингвально</b> — быстрое всасывание (нитроглицерин); 💪 <b>внутримышечно</b> — менее быстрый (адреналин при анафилаксии); 👄 <b>перорально</b> — медленный (аспирин, уголь).</div></details>
+      <details><summary>Пути поступления яда в организм?</summary><div class="ans">👄 <b>Пероральный</b> (через рот) — самый частый; 🌬 <b>ингаляционный</b> — самый быстрый путь в кровь; 🖐 <b>перкутанный</b> (через кожу/слизистые); 💉 <b>парентеральный</b> (инъекции, укусы).</div></details>
+      <details><summary>Этапы детоксикации?</summary><div class="ans">1️⃣ <b>Прекращение поступления яда</b>: с кожи — промыть водой, из воздуха — свежий воздух, из желудка — вызвать рвоту; 2️⃣ <b>Энтеросорбция</b> — сорбенты (уголь 1 г/кг), зондовое промывание; 3️⃣ <b>Антидотная терапия</b>.</div></details>
+      <details><summary>Известные антидоты (5 пар)?</summary><div class="ans">1️⃣ Опиаты → <b>Налоксон</b>; 2️⃣ Угарный газ → <b>Кислород</b>; 3️⃣ Перманганат калия → <b>Витамин С</b>; 4️⃣ Клофелин → <b>Церукал</b>; 5️⃣ Метиловый спирт → <b>Этиловый спирт</b>.</div></details>
+    </div>
+
+    <div class="card qa">
+      <h2><span class="badge-rank">5→6</span> ☣️ Особо опасные инфекции</h2>
+      <details><summary>Что такое ООИ и какие они?</summary><div class="ans">Тяжёлые заразные заболевания с высоким риском летального исхода, требующие карантинных мер: <b>холера, чума, сибирская язва, вирусные геморрагические лихорадки</b> (Эбола, Марбург, Денге, Крымская).</div></details>
+      <details><summary>Холера — специфические симптомы?</summary><div class="ans">Внезапный <b>обильный водянистый стул и рвота</b> <b>без боли в животе</b> и <b>без высокой температуры</b>. Экстремальное обезвоживание за считанные часы.</div></details>
+      <details><summary>Чума — специфические симптомы?</summary><div class="ans">Резкий подъём температуры до <b>40 °C</b>, мучительный озноб, <b>кашель с кровью</b> (лёгочная форма) или резко болезненная твёрдая опухоль лимфоузлов — <b>бубон</b> (бубонная форма).</div></details>
+      <details><summary>Сибирская язва — специфические симптомы?</summary><div class="ans"><b>Безболезненная чёрная корка</b> на коже, окружённая <b>отёком и водянистыми пузырьками</b>.</div></details>
+      <details><summary>ВГЛ (геморрагические лихорадки) — симптомы?</summary><div class="ans"><b>Кровоизлияния на коже, кровоточивость дёсен и носа, рвота кровью</b> на фоне сильного жара.</div></details>
+      <details><summary>Эпидемиологический анамнез при подозрении на ООИ?</summary><div class="ans">🧳 Поездки (Африка, ЮВА, Южная Америка) в последние <b>21–30 дней</b>; 🤝 контакт с лицами с аналогичными симптомами; 💧 сырая вода из водоёмов, мясо диких животных, снятие шкур; 🕷 укусы клещей, блох, грызунов.</div></details>
+      <details><summary>Состав СИЗ при ООИ?</summary><div class="ans">Минимум: <b>защитный костюм, респиратор FFP2/FFP3, защитные очки или экран, две пары перчаток, бахилы</b>; при необходимости — противочумный костюм.</div></details>
+      <details><summary>Последовательность надевания СИЗ?</summary><div class="ans"><b>Костюм → бахилы → первая пара перчаток → респиратор → очки/экран → вторая пара перчаток</b>. Снятие — в обратном порядке, медленно, с дезинфекцией рук после каждого элемента, сворачивая наружной стороной внутрь.</div></details>
+    </div>
+
+    <div class="card qa">
+      <h2><span class="badge-rank">6→7</span> ❤️‍🩹 Реаниматология</h2>
+      <details><summary>Сколько времени от остановки сердца до гибели коры мозга?</summary><div class="ans"><b>4–6 минут</b>. Задача бригады — стабилизировать витальные показатели и довезти пациента живым.</div></details>
+      <details><summary>Что нужно проверить перед началом СЛР?</summary><div class="ans"><b>Безопасность окружения</b> на месте вызова.</div></details>
+      <details><summary>Параметры компрессий грудной клетки?</summary><div class="ans">Руки — <b>середина между нижней и средней третью грудины</b>, строго по центру; глубина <b>5–6 см</b>; частота <b>100–120 нажатий/мин</b>.</div></details>
+      <details><summary>Фибрилляция желудочков — монитор, разряд, тактика?</summary><div class="ans">Монитор: <b>беспорядочные волны</b>. Разряд: <b>ДА ⚡</b>. Тактика: разряд → компрессии, дыхание, <b>Амиодарон после 1-го и 3-го разряда</b>, <b>Адреналин каждые 3–5 минут</b>.</div></details>
+      <details><summary>Асистолия — монитор, разряд, тактика?</summary><div class="ans">Монитор: <b>прямая линия</b>. Разряд: <b>НЕТ</b>. Тактика: компрессии + <b>Адреналин каждые 3–5 минут</b>.</div></details>
+      <details><summary>Электрическая активность без пульса (ЭАБП)?</summary><div class="ans">Монитор: <b>нормальные зубцы, но пульса нет</b>. Разряд: <b>НЕТ</b>. Тактика: компрессии + <b>поиск первичной причины</b> (кровотечение, тромб и пр.).</div></details>
+      <details><summary>Чем обеспечивается дыхание на СМП?</summary><div class="ans">Сначала <b>мешок Амбу</b>, далее можно <b>интубировать</b> (трубка в трахею) и подключить <b>аппарат ИВЛ</b>. Обязателен <b>венозный доступ</b>.</div></details>
+      <details><summary>Адреналин при реанимации — действия?</summary><div class="ans">Повышает <b>возбудимость сердечной мышцы</b>, расслабляет гладкую мускулатуру, противоаллергическое.</div></details>
+      <details><summary>Амиодарон (Кордарон) — действия?</summary><div class="ans"><b>Антиаритмическое</b>, уменьшает ЧСС, сосудорасширяющее.</div></details>
+      <details><summary>Когда прекращаются реанимационные мероприятия?</summary><div class="ans">При отсутствии положительной динамики в течение <b>30 минут</b>.</div></details>
+    </div>
+
+    <div class="card qa">
+      <h2><span class="badge-rank">7→8</span> 🧠 Неврология</h2>
+      <details><summary>Что такое инсульт (ОНМК)?</summary><div class="ans">Нарушение кровоснабжения участка головного мозга с очаговой неврологической симптоматикой, сохраняющейся <b>более 24 часов</b>.</div></details>
+      <details><summary>Очаговые симптомы инсульта?</summary><div class="ans">Нарушение <b>речи</b>, двигательные нарушения, чувствительные расстройства, зрительные расстройства, нарушения слуха, координации, изменение рефлексов, <b>асимметрия лица</b>.</div></details>
+      <details><summary>Ишемический инсульт — причина?</summary><div class="ans">Гибель участка мозга из-за недостатка кровообращения. Основная причина — <b>образование тромба</b>.</div></details>
+      <details><summary>Геморрагический инсульт — причины?</summary><div class="ans">Кровоизлияние в ткани мозга из-за <b>разрыва сосуда</b>. Причины: <b>аневризма</b> (выпячивание стенки сосуда), <b>высокое артериальное давление</b>.</div></details>
+      <details><summary>Судорожный приступ — когда опасен?</summary><div class="ans">Если длится <b>более 5 минут</b> или повторяется сериями без восстановления сознания — развивается <b>отёк головного мозга</b>.</div></details>
+      <details><summary>Классификация судорог?</summary><div class="ans"><b>Генерализованные</b> (судороги всех мышц) и <b>парциальные</b> (отдельных групп мышц).</div></details>
+      <details><summary>Тактика при судорожном приступе?</summary><div class="ans">1️⃣ Повернуть <b>на бок</b>, предотвратить травматизацию; 2️⃣ <b>кислородотерапия</b>; 3️⃣ введение <b>противосудорожного препарата</b>.</div></details>
+    </div>
+
+    <div class="card qa">
+      <h2><span class="badge-rank">8→9</span> 🦴 Травматология</h2>
+      <details><summary>Что такое механическая травма и её виды?</summary><div class="ans">Повреждение целостности тканей/органов от внешнего физического воздействия. Виды: <b>переломы, вывихи, ушибы, сдавления, ссадины, повреждение связок, раны</b>.</div></details>
+      <details><summary>Признаки перелома?</summary><div class="ans">Боль, отёк, <b>деформация</b>, нарушение функции, <b>костная крепитация</b>, костные отломки в ране, <b>патологическая подвижность</b>.</div></details>
+      <details><summary>Признаки ушиба?</summary><div class="ans">Боль, отёк, <b>гематома</b>, нарушение функции (без нарушения целостности тканей).</div></details>
+      <details><summary>Признаки вывиха?</summary><div class="ans">Деформация сустава, боль, отёк, <b>вынужденное положение</b>, нарушение функции, <b>пружинящее сопротивление</b> при попытке изменить положение.</div></details>
+      <details><summary>Чем опасно сдавление (краш-синдром)?</summary><div class="ans">При давлении <b>от 2 часов</b> зажатая часть отмирает, накапливаются токсины; при освобождении они <b>попадают в общий кровоток</b>.</div></details>
+      <details><summary>Классификация ран?</summary><div class="ans">🔪 Резаная (длина &gt; ширины), ушибленная (неровные края), <b>укушенная</b> (наиболее склонна к инфицированию), рваная, колотая (глубина &gt; длины), <b>огнестрельная</b> (входное и выходное отверстия, обожжённые края), рубленая.</div></details>
+      <details><summary>Чем ссадина отличается от раны?</summary><div class="ans">Ссадина затрагивает только <b>эпидермис и наружный слой дермы</b>, рубцов <b>не оставляет</b> (базальный слой сохраняется).</div></details>
+      <details><summary>Порядок первой помощи при механических травмах?</summary><div class="ans">1️⃣ <b>Остановка кровотечения</b> (давящая повязка / жгут) → 2️⃣ <b>обезболивание</b> → 3️⃣ обработка антисептиком, асептическая повязка → 4️⃣ <b>транспортная иммобилизация</b> → 5️⃣ эвакуация в стационар.</div></details>
+      <details><summary>Приспособления для иммобилизации?</summary><div class="ans">🩼 <b>Шины Крамера</b> — переломы/вывихи конечностей, таза; <b>воротник Шанца</b> — шейный отдел позвоночника, ЧМТ; <b>шины Дитерихса</b> — закрытый перелом бедра; <b>транспортный щит</b> — спинальные травмы, СЛР, ДТП, падение с высоты.</div></details>
+      <details><summary>Правила транспортной иммобилизации?</summary><div class="ans">При открытом переломе сначала <b>остановить кровотечение</b>; проводится <b>после обезболивания</b>, на месте происшествия; аксессуары и обувь снять; закрытый перелом — в <b>физиологическом</b> положении, открытый — в <b>вынужденном</b>; <b>кончики пальцев видимы</b> для контроля кровообращения.</div></details>
+    </div>
+  </div>
+</section>
+<!-- ======================= ОТЧЁТЫ ======================= -->
+<section class="tab-pane" id="tab-report">
+  <div class="grid c2">
+    <div class="card">
+      <h2>📋 Регламент заполнения отчётов</h2>
+      <h3>⬆️ Отчёт на повышение</h3>
+      <ol>
+        <li>Канал <b>┃📚・отчёт-на-повышение</b> → гугл-форма в шапке канала</li>
+        <li>Свериться с «Системой повышения» и «Системой баллов»</li>
+        <li>Инструктор проверяет и отправляет запрос после одобрения</li>
+        <li>Учитывается только работа <b>после предыдущего отчёта на повышение</b></li>
+      </ol>
+      <div class="note red">⛔ Активный выговор = повышение только после снятия. Один ранг в сутки: если уже повышались — повысят после 00:00.</div>
+      <h3>🗓 Недельный отчёт</h3>
+      <ul>
+        <li>Канал <b>┃📚・недельный-отчёт</b>, форма в шапке канала</li>
+        <li>Срок: <b>Чт 00:00 — Сб 23:59</b> (для Зав./замов — до Вс 19:00)</li>
+        <li>Обязателен для среднего (5+) и старшего составов</li>
+        <li>Минимум: <b>300 баллов</b> (средний) / <b>400</b> (инструктор, 200+ инструкторской)</li>
+        <li>Несдача в срок = взыскание по <span class="uref" data-u="u3">ст. 3.16 ВУ</span> (строгий выговор / увольнение при повторе)</li>
+        <li>Повышение на 5 ранг позже Сб 18:00 — освобождает от недельника</li>
+      </ul>
+      <h3>🧾 Обязательные поля отчёта</h3>
+      <ul>
+        <li>Никнейм и статический ID персонажа</li>
+        <li>Выслуга лет (только недельник)</li>
+        <li>ПМП (день/ночь), ПМП в больнице — <b>отдельной строкой</b>, в норму ПМП не идут</li>
+        <li>Практические ПМП, таблетки, вакцины, медсправки</li>
+        <li>Ссылка на квалификацию/экзамен (только отчёт на повышение)</li>
+        <li>Доп. баллы: собеседования, обед, RP-квалификации, операции, поощрения</li>
+      </ul>
+      <div class="note">✍️ После каждой ссылки — количество скриншотов в круглых скобках «( )». Нет действий по графе — поле оставляем <b>пустым</b> (не «-» и не «0»). Содержимое ссылки должно соответствовать названию графы!</div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>📸 Требования к скриншотам</h2>
+        <ul>
+          <li>🖥 Полноэкранный скриншот (Win+Shift+S / F12 / PrtSc)</li>
+          <li>🔝 Справа вверху — <b>статик и название сервера</b></li>
+          <li>⏰ Слева внизу — <b>время и дата</b></li>
+          <li>💬 Видимое уведомление («Вы реанимировали…» и т.п.)</li>
+          <li>1 ПМП / вакцина / таблетка = <b>1 отдельный скрин</b></li>
+          <li>👔 Дресс-код по отделу и рангу</li>
+          <li>🎥 <b>Бодикамера</b> с горящим красным индикатором (скрины без бодика не принимаются с 01.10.26)</li>
+        </ul>
+        <h3>☁️ Фотохостинги</h3>
+        <p>✅ Яндекс.Диск · Google Drive · Облако Mail</p>
+        <p>⛔ <b>Запрещены:</b> imgur, yapix, ru.files, ibb</p>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>🕵️ Признаки фиктивной деятельности (п. 4.14)</h2>
+        <ul>
+          <li>❌ ПМП одному и тому же человеку <b>более 2 раз</b></li>
+          <li>❌ Более <b>5 скриншотов подряд</b> с одного места происшествия</li>
+          <li>❌ Регулярное ПМП одному лицу/кругу знакомых (видно никнейм)</li>
+          <li>❌ Иные случаи — по решению Зав./Зам. заведующего</li>
+        </ul>
+        <div class="note red">При подозрении — докладываем Заведующему или заместителям, после согласования отчёт отклоняется.</div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>✅ Чек-лист проверки отчёта (для инструктора)</h2>
+        <div id="checklist"></div>
+        <button class="copy-btn" id="resetChk" style="margin-top:10px">🔄 Сбросить чек-лист</button>
+        <p class="muted" style="margin-top:8px">Проверка отчёта = <b>10 баллов</b>. Отклоняя — обязательно оставь комментарий с причиной в ветке отчёта.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= РЕГЛАМЕНТ ======================= -->
+<section class="tab-pane" id="tab-rules">
+  <input class="search" id="rulesSearch" placeholder="🔍 Поиск по правилам… (например: парковка, выговор, брифинг)">
+  <div class="grid c2 rules-grid">
+    <div class="card rule-block">
+      <h2>🏥 Роль и задачи отдела СМП</h2>
+      <ul>
+        <li>🚨 Выезды на места происшествий (аварии, ЧС, массовые мероприятия)</li>
+        <li>🏥 Дежурства в больницах</li>
+        <li>💉 Вакцинация (приоритет у СМП на дежурстве)</li>
+        <li>💊 Выдача таблеток при отсутствии интернов</li>
+        <li>📄 Выдача справок с квалификацией «Терапевт» (с 5 ранга, при отсутствии ПСЭС)</li>
+      </ul>
+      <p class="muted">Цвет отдела — <b style="color:var(--accent)">КРАСНЫЙ</b>. Средний состав — ранги 3–9. Инструкторов в отделе — до 10 (Устав 2.9).</p>
+    </div>
+    <div class="card rule-block">
+      <h2>👔 Дресс-код и бодикамера</h2>
+      <ul>
+        <li>Форма — только из раздела <b>«Индивидуальное»</b>, строго по каналу «ДРЕСС-КОД ОТДЕЛА СМП»</li>
+        <li>⛔ Менять/снимать/добавлять элементы формы запрещено — взыскание по <span class="uref" data-u="u3">3.19 ВУ</span> (регл. 2.2)</li>
+        <li>👨‍🏫 Инструкторы — расцветка <b>1/3</b>; цвет 2/3 — форма отдела АБ, не используем</li>
+        <li>🎥 Бодикамера Dozor или мини-камера — обязательно при исполнении (регл. 2.23)</li>
+        <li>⌨ Настройка клавиши: F2 → Настройки → Назначение клавиш → Государственные структуры → Бодикамера</li>
+        <li>ПКМ по бодикамере в инвентаре — можно сменить слот или переключить на мини-камеру</li>
+      </ul>
+    </div>
+    <div class="card rule-block">
+      <h2>⛔ Сотруднику СМП запрещено (раздел 3)</h2>
+      <ul>
+        <li>Задерживаться на месте вызова (3.2), игнорировать рацию (3.7)</li>
+        <li>Провозить посторонних в АСМП (3.3), оказывать ПМП в зоне перестрелки (3.16)</li>
+        <li>Заезжать на территорию Армии/ФСБ без сопровождения (3.15)</li>
+        <li>Парковать АСМП у главного входа &gt; 5 минут (3.12), оставлять вне парковки больницы (3.14), парковать с повреждениями/заведённым/открытым (3.13)</li>
+        <li>Нарушать очередность вакцинации на дежурстве (3.17)</li>
+        <li>Вакцинировать и выдавать таблетки в непредназначенных местах (3.18–3.19)</li>
+        <li>Проводить практику интернам (3.20) и ниже должности «Психиатр» (3.21)</li>
+        <li>Брать со склада больше нормы медикаментов (3.10)</li>
+      </ul>
+    </div>
+    <div class="card rule-block">
+      <h2>⚖️ Наказания и отработки</h2>
+      <table>
+        <tr><th>Взыскание</th><th>Отработка (СМП)</th><th>Срок</th></tr>
+        <tr><td>Строгий выговор 1/3</td><td>65 вызовов или 50 000 ₽</td><td>48 ч</td></tr>
+        <tr><td>Строгий выговор 2/3</td><td>100 вызовов или 75 000 ₽</td><td>48 ч</td></tr>
+        <tr><td>Переаттестация</td><td>2 попытки, иначе увольнение</td><td>48 ч</td></tr>
+      </table>
+      <ul>
+        <li>3 строгих выговора = <b>увольнение с ЧС</b></li>
+        <li>Не отработал 1/3 → +1 строгий (2/3); не отработал 2/3 → увольнение</li>
+        <li>С выговором нельзя повышаться; с переаттестацией — нельзя работать</li>
+        <li>Каналы: <b>┃🔴・отработка-выговоров</b>, <b>┃🔴・обжалование-выговоров</b></li>
+        <li>Выговор нельзя выдать, если с нарушения прошло <b>48 часов</b> (<span class="uref" data-u="u12">ВУ 12.12</span>)</li>
+      </ul>
+    </div>
+    <div class="card rule-block">
+      <h2>🕐 Перерывы и отпуска</h2>
+      <ul>
+        <li>☕ Перерыв — до 30 мин раз в час, макс 4 в день + отчёт за последний час</li>
+        <li>🍽 Обед — 1–2 часа раз в день + отчёт за последние 2 часа</li>
+        <li>➕ Доп. перерыв до 2 часов, если отработано 6+ часов (7.2.2)</li>
+        <li>🌴 OOC-отпуск — до 14 дней в месяц; IC — до 3 дней раз в 2 недели</li>
+        <li>⛔ Отпуск не дают с активным строгим выговором; склад/работа аннулируют отпуск</li>
+      </ul>
+    </div>
+    <div class="card rule-block">
+      <h2>📢 Брифинги</h2>
+      <ul>
+        <li>Явка обязательна (<span class="uref" data-u="u3">ВУ 3.12</span> | строгий выговор)</li>
+        <li>После объявления нельзя AFK / перерыв / отпуск</li>
+        <li>Объявление — <b>╭📢・объявление-брифинга</b>, отчёт — <b>┃🗓️・отчет-после-брифинга</b> в срок проводящего</li>
+        <li>Срочно уйти — ЛС ведущему брифинга в Discord</li>
+      </ul>
+      <h3>🩺 Прочее важное</h3>
+      <ul>
+        <li>Медсправка действует <b>30 дней</b>, обновление через 7 дней; плановые проверки еженедельно</li>
+        <li>10 минут на приезд на вызов (ВУ 3.1)</li>
+        <li>Переводы: в другие отделы с 5 ранга, в АБ с 6, в СМП с 3 (автоматом на Лаборанта)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ВЕЩАНИЕ ======================= -->
+<section class="tab-pane" id="tab-vesh">
+  <div class="grid c2">
+    <div class="card">
+      <h2>📣 Правила вещания</h2>
+      <ul>
+        <li>Вещание = информирование сотрудников через фракционную рацию <b>/fb</b></li>
+        <li>Запись — в канале <b>┃📣・вещание-смп</b>; максимум <b>2 вещания в сутки</b> на инструктора</li>
+        <li>Запись на новый день открывается <b>после 22:00</b>; можно бронировать два времени сразу</li>
+        <li>Вещание публикуется в рацию <b>не позднее 20 минут</b> после зарезервированного времени</li>
+        <li>После вещания — отчёт в том же канале: форма + <b>полноэкранный скриншот</b> вещания в чате</li>
+        <li>После галочки Зав./З.З. скрин идёт в недельник = <b>5 баллов</b> инструкторской работы</li>
+      </ul>
+      <h3>📝 Форма записи и отчёта</h3>
+      <div class="note" style="font-family:monospace">@ВашТег<br>12:00<br>@Старший состав СМП</div>
+      <button class="copy-btn" data-copy="@ВашТег&#10;12:00&#10;@Старший состав СМП">📋 Скопировать форму</button>
+    </div>
+    <div class="card">
+      <h2>📻 Тен-коды больницы <span class="pill">обязательно знать</span></h2>
+      <table>
+        <tr><th>Код</th><th>Значение</th></tr>
+        <tr><td><b>10-0</b></td><td>Отмена / отбой вызова</td></tr>
+        <tr><td><b>10-1</b></td><td>Не принял сообщение, повторите</td></tr>
+        <tr><td><b>10-4</b></td><td>Принято</td></tr>
+        <tr><td><b>10-5</b></td><td>Повторите последнее сообщение</td></tr>
+        <tr><td><b>10-6</b></td><td>Не принял / нет / отрицательно</td></tr>
+        <tr><td><b>10-7</b></td><td>Конец связи</td></tr>
+        <tr><td><b>10-20</b></td><td>Локация или местоположение</td></tr>
+      </table>
+      <p class="muted">Используются в фракционной рации /fb при работе на вызовах и дежурствах.</p>
+    </div>
+    <div class="card">
+      <h2>🕐 Тексты вещаний по часам</h2>
+      <div id="veshList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= КВЕСТЫ ======================= -->
+<section class="tab-pane" id="tab-quests">
+  <div class="card" style="margin-bottom:16px">
+    <h2>🎯 Как работают квесты</h2>
+    <ul>
+      <li>Каждый квест выполняет только <b>один</b> сотрудник — далее закрывается; имя первого увековечивается</li>
+      <li>Доказательства на фотохостинг + ЛС <b>Зав.СМП | Даниил Быков | 11395</b>: ссылка + название квеста</li>
+      <li>Призовые баллы публикуются в <b>┃🎁・поощрения</b>, идут в один отчёт на повышение и один недельник</li>
+      <li>⛔ Действуют правила против фиктивной деятельности (п. 4.14)</li>
+    </ul>
+  </div>
+  <div class="grid c3">
+    <div class="card">
+      <h2>🥉 II категория</h2>
+      <p><span class="pill green">50 000 ₽ + письмо премьер-министра + 100 баллов</span></p>
+      <ul style="margin-top:8px">
+        <li>🫀 «Ходячий дефибриллятор» — 100 ПМП в больнице</li>
+        <li>🌉 «Не вздумай прыгать!» — 25 ПМП на мосту ✅</li>
+        <li>⚡ «Заземлитель» — 25 ПМП электрикам</li>
+        <li>🎣 «Улов с того света» — 25 ПМП у зоны рыбалки</li>
+        <li>🏥 «Практика на своих» — 50 ПМП сотрудникам Больницы</li>
+        <li>🚫 «Черная полоса» — 100 отменённых вызовов ✅</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>🥈 I категория</h2>
+      <p><span class="pill green">75 000 ₽ + письмо премьер-министра + 125 баллов</span></p>
+      <ul style="margin-top:8px">
+        <li>🌾 «Попал под комбайн» — 25 ПМП на ферме ✅</li>
+        <li>👮 «Улица разбитых фонарей» — 25 ПМП сотрудникам МВД</li>
+        <li>🚔 «Техосмотр не пройден» — 25 ПМП сотрудникам ГИБДД</li>
+        <li>🪖 «Не годен» — 25 ПМП сотрудникам Армии</li>
+        <li>🚐 «Маршрутка судного дня» — 25 вакцинаций в мед.отсеке АСМП</li>
+        <li>🍀 «Любимчик диспетчера» — 2 раза приехать на счастливый вызов</li>
+        <li>🌙 «Ночной дежурный» — 250 ПМП в ночную смену</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>🥇 Высшая категория</h2>
+      <p><span class="pill green">100 000 ₽ + 2 письма премьер-министра + 150 баллов</span></p>
+      <ul style="margin-top:8px">
+        <li>🟥 «Полотно для матадора» — 50 ПМП в красной верхней одежде ✅</li>
+        <li>🟨 «Одуванчик под капельницей» — 50 ПМП в жёлтом</li>
+        <li>🟪 «Фиолетовый закат» — 50 ПМП в фиолетовом ✅</li>
+        <li>🟩 «Зелёнка оптом» — 50 ПМП в зелёном ✅</li>
+        <li>🟦 «Синий иней» — 50 ПМП в синем</li>
+        <li>⬛ «Мама, я нефор» — 50 ПМП в чёрном ✅</li>
+        <li>⬜ «Стирать с отбеливателем» — 50 ПМП в белом</li>
+        <li>🏛 «Музейная редкость» — 10 ПМП людям с паспортом &lt; 500</li>
+        <li>📜 «Антиквариат на носилках» — 25 ПМП с 3-значным паспортом</li>
+        <li>🎖 «Уважение старшим» — 50 ПМП с 4-значным паспортом ✅</li>
+        <li>🪞 «Зеркало» — 10 ПМП с зеркальным паспортом (1221)</li>
+        <li>🔢 «Круглое число» — 25 ПМП с «круглым» паспортом (×100)</li>
+      </ul>
+      <p class="muted">✅ — уже выполнены (см. канал «КВЕСТЫ СМП»).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ССЫЛКИ ======================= -->
+<section class="tab-pane" id="tab-links">
+  <div class="grid c2">
+    <div class="card">
+      <h2>📚 Лекции для экзаменов (Google Docs)</h2>
+      <div class="grid" style="gap:10px">
+        <a class="linkcard" target="_blank" href="https://docs.google.com/document/d/16yD1V4ucThEBJ5kprJ62A0snoXoVDwoajbroMCScajQ/edit"><span class="ic">🚑</span><span>Лекция по ПМП<small>3 → 4 · вызовы, СГУ, практика</small></span></a>
+        <a class="linkcard" target="_blank" href="https://docs.google.com/document/d/1EikGmog_6JffCiMrx90msUkj4Xco8-7QrLEg4mIFTDY/edit"><span class="ic">💉</span><span>Лекция по вакцинации<small>3 → 4 · места, цены, порядок</small></span></a>
+        <a class="linkcard" target="_blank" href="https://docs.google.com/document/d/17CxjzK5nWEgVPZAuHD1zFkYMrIJZx41koh-pc3gPhm8/edit"><span class="ic">💊</span><span>Фармакология и токсикология<small>4 → 5 · препараты, антидоты</small></span></a>
+        <a class="linkcard" target="_blank" href="https://docs.google.com/document/d/1xW8sLxulGjbzm2vkRIlleVD19Q7H6oHJVLA86HRtxVA/edit"><span class="ic">☣️</span><span>Особо опасные инфекции<small>5 → 6 · ООИ, СИЗ</small></span></a>
+        <a class="linkcard" target="_blank" href="https://docs.google.com/document/d/1r-3LlKohRAqPZxT30W4hQqsL849i1wpTThHPI6QoPrE/edit"><span class="ic">❤️‍🩹</span><span>Реаниматология<small>6 → 7 · СЛР, разряды, препараты</small></span></a>
+        <a class="linkcard" target="_blank" href="https://docs.google.com/document/d/1emQKrYSHMy9_B20No1RbYK_dY8hbFO4IYOEffQCEeJ4/edit"><span class="ic">🧠</span><span>Неврология<small>7 → 8 · инсульт, судороги</small></span></a>
+        <a class="linkcard" target="_blank" href="https://docs.google.com/document/d/1w5a5jAiHjfdjDvUYFGh2ufYd3lhT4vCi7BxrMy7nXkU/edit"><span class="ic">🦴</span><span>Травматология<small>8 → 9 · травмы, иммобилизация</small></span></a>
+      </div>
+    </div>
+    <div class="card">
+      <h2>⚖️ Нормативные документы (форум)</h2>
+      <div class="grid" style="gap:10px">
+        <a class="linkcard" target="_blank" href="https://forum.russia.online/threads/bol-nitsa-ustav.501/"><span class="ic">🏥</span><span>Устав Больницы<small>главный документ организации</small></span></a>
+        <a class="linkcard" target="_blank" href="https://forum.russia.online/forums/general-server-rules/"><span class="ic">🌐</span><span>Общие правила проекта<small>сервер Россия Онлайн</small></span></a>
+        <a class="linkcard" target="_blank" href="https://forum.russia.online/threads/pravila-gosudarstvennykh-organizatsii.11/"><span class="ic">🏛</span><span>Правила государственных организаций</span></a>
+        <a class="linkcard" target="_blank" href="https://forum.russia.online/threads/kodeks-etiki-i-sluzhebnogo-povedeniya-gosudarstvennykh-sluzhashchikh.1354/"><span class="ic">🤵</span><span>Кодекс этики и служебного поведения</span></a>
+        <a class="linkcard" target="_blank" href="https://forum.russia.online/threads/trudovoi-kodeks.1395/"><span class="ic">📑</span><span>Трудовой кодекс</span></a>
+        <a class="linkcard" target="_blank" href="https://forum.russia.online/threads/zakon-goroda-moskvy-o-zdravookhranenii.1425/"><span class="ic">⚕️</span><span>Закон «О здравоохранении»</span></a>
+        <a class="linkcard" target="_blank" href="https://forum.russia.online/threads/bol-nitsa-tsenovaya-politika.10027/"><span class="ic">💰</span><span>Ценовая политика Больницы</span></a>
+        <a class="linkcard" target="_blank" href="https://docs.google.com/document/d/18Y_V7KS62Kqn9X4JdhuoyB0P1qN9BggV/edit"><span class="ic">📄</span><span>Регламент выдачи мед. карт</span></a>
+        <a class="linkcard" target="_blank" href="https://docs.google.com/document/d/1eqERsHLA69WroRCl3N8aYt0GNuE0DpQ8Hbi08JtEgAA/edit"><span class="ic">📣</span><span>Список вещаний СМП<small>официальный документ</small></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= УСТАВ ======================= -->
+<section class="tab-pane" id="tab-ustav">
+  <div class="ustav-wrap">
+    <div class="ustav-nav" id="ustavNav">
+      <a href="#u1">1 · Общие положения</a>
+      <a href="#u2">2 · Иерархия и отделы</a>
+      <a href="#u3">3 · Общие обязанности</a>
+      <a href="#u4">4 · Права сотрудников</a>
+      <a href="#u5">5 · Запрещено</a>
+      <a href="#u6">6 · Разрешено</a>
+      <a href="#u7">7 · Рабочий день</a>
+      <a href="#u8">8 · Транспорт</a>
+      <a href="#u9">9 · Наказания</a>
+      <a href="#u10">10 · Повышение и восстановление</a>
+      <a href="#u11">11 · Трудоустройство</a>
+      <a href="#u12">12 · АБ, старший и руководящий состав</a>
+      <a href="#u13">13 · Квалификации</a>
+      <a href="#u14">14 · Премирование</a>
+    </div>
+    <div class="card ustav-body">
+      <p class="muted">📜 Полный текст Устава Больницы с <a class="link" target="_blank" href="https://forum.russia.online/threads/bol-nitsa-ustav.501/">forum.russia.online</a> · опубликован 22.08.2026, изменён 05.10.2026. Прокручивай или выбирай главу слева.</p>
+
+      <h3 id="u1">📕 Глава 1. Общие положения Больницы</h3>
+      <p><b>1.1.</b> Больница является медицинской организацией, которая оказывает медицинские услуги и медицинскую помощь, обеспечивает оказание первой помощи пострадавшему и транспортировку в медицинское учреждение. Проводит санитарные проверки гос. организациям, государственные мероприятия.</p>
+      <p><b>1.2.</b> Сотрудники Больницы действуют на всей территории города Москвы.</p>
+      <p class="note-u">➤ Примечание: если вызов поступил на закрытую территорию, сотрудник может заехать и передвигаться по ней только с сопровождением.</p>
+      <p><b>1.3.</b> Руководство Больницы: Премьер-министр, Вице-Премьер-министр, Министр Здравоохранения, Заместители Министра Здравоохранения, Главный врач, Заместитель главного врача.</p>
+      <p><b>1.4.</b> На время военного положения и ЧП руководство и координацию может взять директор ФСБ после уведомления Премьер-министра или Вице-Премьер-министра.</p>
+      <p><b>1.5.</b> Устав Больницы — внутренний нормативно-правовой документ, регламентирующий деятельность сотрудников.</p>
+      <p><b>1.6.</b> Устав содержит и определяет внутренний трудовой распорядок, права и обязанности сотрудников и должностных лиц.</p>
+      <p><b>1.7.</b> Незнание или непонимание положений Устава не освобождает от ответственности за его нарушение.</p>
+      <p><b>1.8.</b> Любой отчёт сотрудника считается официальной фото/видеофиксацией — на него можно опираться при выдаче наказания.</p>
+      <p><b>1.9.</b> Документы, выпущенные Главным врачом и ЗГВ, обязательны к изучению и незамедлительному исполнению всеми сотрудниками.</p>
+      <p><b>1.10.</b> Специальная связь — часть внутренней информационной системы; вступление и нахождение в ней обязательно. Потеря доступа к спецсвязи может повлечь увольнение.</p>
+      <p><b>1.11.</b> ГВ, ЗГВ и Заведующий больницей могут выполнять обязанности сотрудников любых отделов и отклоняться от устава, если это не нарушает другие НПА.</p>
+      <p><b>1.12.</b> Каждый отдел имеет регламент отдела и систему повышения.</p>
+      <p><b>1.13.</b> Устав содержит дополнительные приложения: дисциплинарный раздел, регламенты и уставы отделов.</p>
+      <p><b>1.14.</b> Устав может изменяться Главным врачом; изменения имеют силу после подписания Премьер-министром РО.</p>
+      <p><b>1.15.</b> В Больнице действует прецедентная система правил: нарушение, не описанное в уставе, рассматривается руководящим составом. Доказательство хранить 72 часа.</p>
+      <p><b>1.16.</b> Действует прогрессивная система дисциплинарных взысканий: при повторных нарушениях наказание усиливается вплоть до понижения.</p>
+
+      <h3 id="u2">📕 Глава 2. Иерархия и отделы Больницы</h3>
+      <p><b>2.1.</b> Иерархия: Руководящий состав — Главный врач (13), ЗГВ (12). Старший состав — Заведующий больницей (11), Зав. отделением (11), Зам. зав. отделением (10), Инструкторы (доп. служебная роль). Старший состав АБ — Зав. АБ (11), З.З. АБ (10). Средний состав — Хирург (9), Терапевт (8), Психиатр (7), Ст. ординатор (6), Ординатор (5), Фельдшер (4), Лаборант (3). Младший состав — Санитар (2), Интерн (1).</p>
+      <p class="note-u">➤ Заведующий больницей не закрепляется за отделением и стоит выше заведующих отделениями.</p>
+      <p><b>2.2.</b> Обращаться строго по иерархии: АБ / Инструктор отдела → Зам. зав. отделением → Зав. отделением → Старший состав АБ → Зав. больницей → ЗГВ → ГВ.</p>
+      <p><b>2.2.1.</b> Внутри отдела: Сотрудник → Инструктор отдела → Зам. зав. отделением → Зав. отделением.</p>
+      <p><b>2.3.</b> Младший и средний составы обязаны подчиняться правомерным требованиям старшего и руководящего составов и АБ. | Строгий выговор / Увольнение с одобрения ЗГВ/ГВ.</p>
+      <p><b>2.4.</b> Отдел Кадров (ОК): собеседования, лекции и инструктажи младшего состава, проверка отчётов младшего состава, обучение и экзаменация ординаторов, дисциплина младшего состава, выдача медсправок при трудоустройстве. Лимит — 35 мест (2.4.1). Могут покидать территорию при стабильной работе отдела (2.4.2).</p>
+      <p><b>2.5.</b> Администрация Больницы (АБ): дисциплина и взыскания, переклички и брифинги, проверка отчётов и графика. Лимит — 25 мест (2.5.1). Минимум 1 сотрудник АБ в каждой из двух больниц в рабочее время (2.5.2).</p>
+      <p><b>2.6.</b> ПСЭС: психиатрия, физ. обследования, санэпидконтроль, проверки организаций, выдача медсправок. Лимит — 30 мест (2.6.1).</p>
+      <p><b>2.7.</b> Отдел СМП: оказание ПМП на вызовах, дежурства во всех больницах, выдача таблеток, выдача вакцин. Количество сотрудников не ограничено (2.7.1).</p>
+      <p><b>2.8.</b> Отделение интенсивной терапии (ИТ): операции, ветеринария, косметология, помощь СМП, вакцинация с приоритетом в закреплённой больнице, обучение RP-процедурам. Лимит — 15 мест (2.8.1).</p>
+      <p><b>2.9.</b> Отделы могут иметь инструкторов: СМП — 10, ПСЭС — 5, ОК — 5, ИТ — 5.</p>
+
+      <h3 id="u3">📕 Глава 3. Общие обязанности сотрудников Больницы</h3>
+      <p><b>3.1.</b> Немедленный выезд на вызовы. ➤ 10 минут на приезд на вызов своей службы.</p>
+      <p><b>3.2.</b> Обеспечивать эпидемиологическую безопасность.</p>
+      <p><b>3.3.</b> Обеспечивать правильное хранение и учёт лекарств и оборудования. | Строгий выговор</p>
+      <p><b>3.4.</b> Максимум медикаментов при себе: парацетамол 48, эпинефрин 20, акт. уголь 10, азитромицин 10, ИРП 3, бинты 20. | Строгий выговор. Искл.: руководящий состав; ГВ может менять норму постановлением.</p>
+      <p><b>3.5.</b> Запрещено брать/иметь больше нормы п. 3.4. | Строгий выговор</p>
+      <p><b>3.6.</b> Обязаны подтверждать квалификацию в установленном порядке.</p>
+      <p><b>3.6.1.</b> Сроки инициирования повышения: 1→2 — 24 ч; 2→3 — 48 ч; 3→4 — 72 ч; 4→5 — 96 ч; 5→6 — 144 ч; 6→7 — 192 ч; 7→8 — 240 ч; 8→9 — 312 ч. Искл.: одобрение ГВ/ЗГВ, отпуск.</p>
+      <p><b>3.7.</b> Информировать старший и руководящий состав о всех ЧП.</p>
+      <p><b>3.8.</b> Проводить мероприятия по снижению происшествий и вспышек инфекций.</p>
+      <p><b>3.9.</b> Вне очереди оказывать помощь представителям гос. служб при выполнении ими обязанностей.</p>
+      <p><b>3.10.</b> При необходимости госпитализации доставить больного в ближайшую больницу.</p>
+      <p><b>3.11.</b> Соблюдать дресс-код своего отдела. | Строгий выговор. Искл.: свободный дресс-код старшего/руководящего состава с одобрения ГВ.</p>
+      <p><b>3.12.</b> Являться на брифинги АБ, старшего и руководящего состава. | Строгий выговор. С момента объявления запрещены перерыв, выезд из города, отдых.</p>
+      <p><b>3.13.</b> Во время дежурства находиться на закреплённых местах несения дежурства. | Строгий выговор</p>
+      <p><b>3.13.1.</b> Осмотры/вакцины/справки — только в предназначенных местах. | Строгий выговор. ГКБ №1: вакцинация и операции — операционный блок (левое крыло), кабинеты Терапевта (правое крыло); собеседования — 2 этаж, Терапевт (левое крыло); парацетамол — стойка регистрации и мед. салон АСМП. ГКБ №2: вакцинация/операции — 1 этаж Операционные №1/№2, кабинет Скорая Помощь (задняя регистратура), при нагрузке 2 этаж Кардиолог/Педиатр/МРТ; справки — 2 этаж Кардиолог/Педиатр/МРТ и Скорая Помощь при нагрузке; собеседования — 2 этаж Терапевт; парацетамол — стойка регистрации с главного входа и АСМП.</p>
+      <p><b>3.14.</b> Отработать выговор в течение 48 часов. | Строгий выговор. Старший состав — 72 часа.</p>
+      <p><b>3.15.</b> Пройти переаттестацию в течение 48 часов, две попытки. | Увольнение</p>
+      <p><b>3.16.</b> Еженедельный отчёт в канале отделения «Недельный отчёт», с 00:00 четверга до 23:59 субботы. | Строгий выговор / Увольнение при повторе. Фиктивные/неполные/дублирующие отчёты = отсутствие отчёта. ГВ/ЗГВ могут затребовать индивидуальный отчёт — 24 часа на предоставление.</p>
+      <p><b>3.17.</b> Действующая медсправка о псих. и физ. здоровье. | Строгий выговор. Справки действительны 30 дней.</p>
+      <p><b>3.18.</b> Отчёт после брифинга в спецканале в сроки проводящего. | Строгий выговор</p>
+      <p><b>3.19.</b> Соблюдать регламент своего отделения. | Строгий выговор 1/3, 2/3 | Увольнение с одобрения ЗГВ/ГВ</p>
+      <p><b>3.20.</b> Получить удостоверение в здании Правительства РО и предъявлять по первому требованию.</p>
+      <p><b>3.21.</b> Пройти ординатуру в течение 3 дней. | Увольнение с ЧС организации</p>
+      <p><b>3.22.</b> Смена имени/фамилии — только с разрешения руководящего состава. | Увольнение</p>
+      <p><b>3.23.</b> Вести учёт служебной деятельности по формату регламента отдела.</p>
+
+      <h3 id="u4">📕 Глава 4. Права сотрудников Больницы</h3>
+      <p><b>4.1.</b> Право отказывать пациентам при неадекватном поведении, неуважении, угрозе жизни. Искл.: шоковое/тяжёлое состояние пациента.</p>
+      <p><b>4.2.</b> Отдых в отведённом месте до 15 минут без одобрения. Нельзя покидать комнату отдыха и снимать форму.</p>
+      <p><b>4.3.</b> Бесплатное лечение.</p>
+      <p><b>4.4.</b> АБ, инструкторы, старший и руководящий состав могут запросить отчёт о работе и местоположении любого сотрудника; отказ/отсутствие без уважительной причины = взыскание.</p>
+      <p><b>4.5.</b> АБ могут покидать больницу для поиска нарушителей графика.</p>
+      <p><b>4.6.</b> Увольнение по собственному желанию; Интерн/Санитар или неотработанный выговор при увольнении = чёрный список.</p>
+      <p><b>4.7.</b> ОК и старший состав обязаны проводить собеседования и выдавать трудовой договор; старший состав принимает, если нет ОК или в нерабочее время.</p>
+      <p><b>4.8.</b> Все отделы обязаны помогать друг другу по просьбе коллег.</p>
+
+      <h3 id="u5">📕 Глава 5. Сотрудникам Больницы запрещено</h3>
+      <p><b>5.1.</b> Отказывать в лечении/помощи/консультации. | Строгий выговор. Искл.: угроза жизни, неуважение, аморальное поведение, отказ от оплаты.</p>
+      <p><b>5.2.</b> Использовать АСМП в личных целях и для перевозки посторонних без веских причин. | Строгий выговор</p>
+      <p><b>5.3 / 5.3.1.</b> В рабочее время — на рабочем месте; не покидать территорию в личных целях. | Строгий выговор. Искл.: руководящий состав, старший состав (вкл. инструкторов) при стабильной работе отдела, ОК/АБ по п. 2.4.2/2.5.2, обед, отпуск.</p>
+      <p><b>5.4.</b> Игнорировать фракционную рацию. | Строгий выговор</p>
+      <p><b>5.5.</b> Нелегальная/криминальная деятельность. | Строгий 2/3 | Увольнение</p>
+      <p><b>5.6.</b> Оказывать помощь во время перестрелок и ожидать их окончания. | Строгий выговор / Увольнение</p>
+      <p><b>5.7.</b> Поднимать/носить/применять огнестрельное или холодное оружие на смене. | Строгий 2/3 | Увольнение. Искл.: нож для перерезания верёвок/стяжек. 5.7.1 — нелегал на смене; 5.7.2 — спецсредства (бронежилеты, тазеры, дубинки).</p>
+      <p><b>5.8.</b> Наркотики/алкоголь на смене или опьянение. | Строгий 2/3 | Увольнение</p>
+      <p><b>5.9.</b> Соблюдать дисциплину: запрещены музыка, пение, танцы, бег по больнице, драки, курение, гитара, ношение людей на руках без причины, свист, мат, азартные игры в форме/на смене. 5.9.1 — непристойные жесты. | Строгий выговор</p>
+      <p><b>5.10.</b> Клевета, обман, укрывательство провинившихся. | Строгий 2/3</p>
+      <p><b>5.11.</b> Ущерб имуществу Больницы. | Строгий выговор</p>
+      <p><b>5.12.</b> Азартные игры в форме/рабочее время. | Строгий / Строгий 2/3. Колесо фортуны — не азартная игра.</p>
+      <p><b>5.13.</b> Требовать доплату с пациента. | Строгий выговор</p>
+      <p><b>5.14.</b> Брать оплату больше или меньше прейскуранта. | Строгий 2/3</p>
+      <p><b>5.15.</b> Иметь более одного дефибриллятора. | Строгий выговор. Утеря = увольнение с ЧС.</p>
+      <p><b>5.16.</b> Создавать/провоцировать конфликты в коллективе. | Строгий / 2/3 / Увольнение</p>
+      <p><b>5.17.</b> Злоупотребление полномочиями (в т.ч. выдача лекарств без обращения). | Строгий 2/3 | Увольнение</p>
+      <p><b>5.18.</b> Ношение маски/перчаток в рабочее время. | Строгий выговор. Искл.: медицинская маска, латексные перчатки.</p>
+      <p><b>5.19.</b> Покидать город более чем на 7 дней. | Увольнение. Искл.: отпуск.</p>
+      <p><b>5.20 / 5.20.1.</b> На теор. экзамены Интерн→Санитар и Санитар→Лаборант — две попытки. | Увольнение с ЧС</p>
+      <p><b>5.21.</b> Присваивать/терять медикаменты и спецсредства. | Понижение до Интерна / Увольнение с ЧС</p>
+      <p><b>5.22.</b> Выполнять требования старшего/руководящего состава и АБ по иерархии. | Строгий / 2/3</p>
+      <p><b>5.23.</b> Интернам и Санитарам принимать вызовы. | Строгий выговор. Искл.: самостоятельные вызовы для ординатуры.</p>
+      <p><b>5.24.</b> Брать более 3 ИРП в час. | Строгий выговор</p>
+      <p><b>5.25.</b> Оставлять личные вещи на склад. | Строгий выговор</p>
+      <p><b>5.26.</b> Интернам и Санитарам иметь два строгих выговора. | Увольнение с ЧС</p>
+      <p><b>5.27.</b> Нарушать график рабочего дня. | Строгий / Увольнение</p>
+      <p><b>5.28.</b> Оказывать псих. помощь вне ПСЭС. | Строгий выговор. Искл.: старший и руководящий состав.</p>
+      <p><b>5.29.</b> Использовать уязвимости устава. | Строгий выговор</p>
+      <p><b>5.30.</b> Парковать личный транспорт на парковках АСМП. | Строгий выговор</p>
+      <p><b>5.31.</b> Рекламировать свои услуги/бизнесы, агитация. | Строгий 2/3 / Увольнение</p>
+      <p><b>5.32.</b> Соблюдать все НПА РО. | Строгий / Переаттестация / Понижение / Увольнение / ЧС</p>
+      <p><b>5.33.</b> Подрывать репутацию Больницы. | Строгий / Увольнение</p>
+      <p><b>5.34.</b> Халатность к обязанностям. | Строгий / Увольнение</p>
+      <p><b>5.35.</b> Нарушать субординацию, оспаривать решения старшего состава. | Строгий 2/3 | Увольнение. Обжалование — через жалобы/руководство.</p>
+      <p><b>5.36.</b> Не выполнять поручения начальства в рабочее время. | Строгий / 2/3</p>
+      <p><b>5.37.</b> Мат, оскорбления, хамство гражданам, пациентам, коллегам. | Строгий / 2/3 / Увольнение</p>
+      <p><b>5.38.</b> Оскорбление старшего и руководящего состава (прямое/косвенное). | Строгий / 2/3 / Увольнение</p>
+      <p><b>5.39.</b> Старшему и руководящему составу неуважительно относиться к младшему и среднему составу. | Строгий / Снятие / Увольнение</p>
+      <p><b>5.40.</b> Отчёты не по форме отклоняются. | Строгий выговор</p>
+      <p><b>5.41.</b> Передвигаться по городу или выезжать на вызовы на личном транспорте. | Строгий / Увольнение. Искл.: между больницами в форме без нашивок; АБ/старший/руководящий — для проверок.</p>
+      <p><b>5.42.</b> Нарушать врачебную тайну. | Строгий / Увольнение</p>
+      <p><b>5.43.</b> Оспаривать решения старшего/руководящего состава. | Строгий 2/3 | Увольнение. Обжалование по п. 5.35 и 9.9.</p>
+      <p><b>5.44.</b> Интерны/Санитары при увольнении по собственному или отсутствии &gt;7 дней без отпуска — в ЧС.</p>
+      <p><b>5.45.</b> Корректно и своевременно вести документацию, обновлять роли и записи. | Строгий / Увольнение</p>
+      <p><b>5.46.</b> Превышение должностных полномочий (самовольная выдача взысканий, квалификаций, вмешательство в другие отделы и т.п.). | Строгий / 2/3 / Увольнение</p>
+      <p><b>5.47.</b> Намеренное создание ситуаций для фиксации нарушений, избыточные проверки одного сотрудника. | Строгий выговор</p>
+      <p><b>5.48.</b> Провоцировать сотрудников на нарушение устава. | Строгий 2/3 | Увольнение</p>
+
+      <h3 id="u6">📕 Глава 6. Сотрудникам Больницы разрешено</h3>
+      <p><b>6.1.</b> Отпуск: вне города — до 14 дней раз в 30 дней; в городе — до 3 дней раз в 14 дней. Суммарно не более 14 дней в месяц. Не даётся при активном выговоре. 6.1.1/6.1.2 — склад или работа в отпуске аннулируют его.</p>
+      <p><b>6.2.</b> Выдача медсправок — с Ординатора (5) при квалификации «Терапевт». Искл.: старший/руководящий состав, ОК при трудоустройстве.</p>
+      <p><b>6.3.</b> Приоритет выдачи медкарт — ПСЭС на дежурстве.</p>
+      <p><b>6.4.</b> Приоритет выдачи вакцин — СМП на дежурстве.</p>
+      <p><b>6.5.</b> Разрешено оказывать помощь людям в маске.</p>
+      <p><b>6.6.</b> Разрешено иметь медпредметы организации вне смены.</p>
+      <p><b>6.7.</b> Перевод в другой отдел — с Ординатора (5) по заявлению. Искл.: в СМП — автоматически на Лаборанта (3), в АБ и ПСЭС — со Ст. ординатора (6).</p>
+
+      <h3 id="u7">📕 Глава 7. Рабочий день Больницы</h3>
+      <p><b>7.1.</b> Дневная смена: Пн–Пт 10:00–22:00, Сб–Вс 11:00–22:00; обед 14:00–15:00 (работа в обед — ×2 балла). Ночная: Пн–Пт 22:00–10:00, Сб–Вс 22:00–11:00. Ночная необязательна; суммарно не более 12 часов в сутки.</p>
+      <p><b>7.2.</b> Перерыв до 30 минут, не чаще раза в час, максимум 4 за день. Нельзя покидать комнату отдыха и снимать форму.</p>
+      <p><b>7.2.1.</b> Перерыв на отдых и питание 1–2 часа при условии 2 часов на рабочем месте до этого.</p>
+      <p><b>7.2.2.</b> Более 6 часов на службе — дополнительный перерыв до 2 часов без учёта обеденного.</p>
+      <p><b>7.2.3.</b> Работодатель/начальник может отказать в перерыве при весомой причине.</p>
+
+      <h3 id="u8">📕 Глава 8. Транспорт Больницы</h3>
+      <p><b>8.1.</b> Каждый сотрудник обязан знать правила пользования АСМП.</p>
+      <p><b>8.2.</b> АСМП разрешено брать с должности Лаборант (3).</p>
+      <p><b>8.3.</b> АСМП — для выездов на происшествия, ПМП и помощи госорганизациям и гражданам.</p>
+      <p><b>8.4.</b> Спецсигналы — только в экстренных ситуациях (вызов, доставка пациента).</p>
+      <p><b>8.5.</b> Нарушать ПДД можно только с включёнными спецсигналами.</p>
+      <p><b>8.6.</b> Запрещено оставлять АСМП у главного входа. Искл.: доставка пострадавшего, стоянка до 5 минут.</p>
+      <p><b>8.7.</b> Не оставлять АСМП без присмотра более 10 минут. Искл.: экстренные ситуации, жалобы граждан; старший и руководящий состав.</p>
+      <p><b>8.8.</b> АСМП — основная машина для оказания ПМП.</p>
+
+      <h3 id="u9">📕 Глава 9. Виды и случаи наказаний</h3>
+      <p><b>9.1–9.2.</b> Прогрессивная система. Виды: строгий выговор (1/3, 2/3), переаттестация, увольнение. Три строгих = увольнение с ЧС. С выговором нельзя повышаться; с переаттестацией нельзя работать и повышаться до сдачи.</p>
+      <p><b>9.3.</b> Три строгих выговора = увольнение. Переаттестация — при грубом несоблюдении устава, переводе и восстановлении.</p>
+      <p><b>9.4.</b> Отработка строгого выговора — 48 часов, деятельность или штраф в казну (п. 9.10). Неотработка 1/3 → +1 строгий (2/3); неотработка 2/3 → увольнение.</p>
+      <p><b>9.5 / 9.5.1.</b> Вид отработки определяют старший/руководящий состав или АБ по системе отработок.</p>
+      <p><b>9.6.</b> Правомерный арест и заключение под стражу = увольнение; залог — взыскание по решению прокурора.</p>
+      <p><b>9.7.</b> Неотработанный выговор при увольнении оплачивается по регламенту. | Чёрный список</p>
+      <p><b>9.8.</b> Руководящий/старший состав и АБ вправе отказать в оплате выговора нарушителю.</p>
+      <p><b>9.9.</b> Выдавший выговор не может рассматривать обжалование. Искл.: руководящий состав, Зав. АБ.</p>
+      <p><b>9.10.</b> Система отработок: Ординаторы 1/3 — 96 таблеток или 25 000 ₽; 2/3 — увольнение с ЧС. ОК 1/3 — 9 отчётов / 7 принятых / 50 000 ₽; 2/3 — 17 отчётов / 9 принятых / 75 000 ₽. <b>СМП 1/3 — 65 вызовов или 50 000 ₽; 2/3 — 100 вызовов или 75 000 ₽.</b> ПСЭС 1/3 — 30 справок или 50 000 ₽; 2/3 — 60 справок и 1 проверка или 75 000 ₽. АБ 1/3 — 6 выговоров, 8 обедов/отпусков, 1 брифинг или 75 000 ₽; 2/3 — перевод в СМП. ИТ 1/3 — 2 операции / 65 вызовов / 50 000 ₽; 2/3 — 4 операции / 100 вызовов / 75 000 ₽. Старший состав 1/3 — 90 вызовов и 2 участия в крафте или 90 000 ₽; 2/3 — снятие. 3/3 = увольнение + ЧС.</p>
+
+      <h3 id="u10">📕 Глава 10. Повышение и восстановление сотрудников</h3>
+      <p><b>10.1.</b> Для повышения/перевода не должно быть активных строгих выговоров. 10.1.1 — по регламентированной системе; 10.1.2 — обход системы запрещён. | Понижение</p>
+      <p><b>10.2–10.5.</b> Восстановление — заявление на официальном портале со всеми требуемыми данными, доказательства нахождения в организации (фото удостоверения/должности в планшете), без ЧС и судимостей, паспортные данные должны совпадать с кадровым аудитом.</p>
+      <p><b>10.6.</b> Восстановление на ту же должность или на усмотрение ГВ.</p>
+      <p><b>10.7.</b> Прошло 30+ дней — принимается Интерном; бывший старший состав — не выше Терапевта (8). 10.7.2 — для увольнения с восстановлением нужна ординатура. 10.7.3 — не восстанавливаются уволенные за невыполнение обязанностей/нарушения. 10.7.4 — при восстановлении обязательна переаттестация.</p>
+
+      <h3 id="u11">📕 Глава 11. Трудоустройство в Больницу</h3>
+      <p><b>11.1.</b> При трудоустройстве нужны: действующие медсправки, водительское удостоверение категории B, паспорт, диплом о высшем мед. образовании, гражданство РО, возраст 18+.</p>
+      <p><b>11.2–11.2.1.</b> Внешний вид кандидата — по Кодексу этики; можно отказать.</p>
+      <p><b>11.3.</b> На собеседовании проверить: отсутствие судимости и ЧС.</p>
+      <p><b>11.4–11.4.1.</b> Можно запросить согласие на обработку персональных данных; отказ = отказ в приёме.</p>
+      <p><b>11.5.</b> Нарушение законодательства на собеседовании = отказ.</p>
+      <p><b>11.6.</b> Места собеседований: ГКБ №1 — учебно-методический кабинет; ГКБ №2 — 2 этаж, кабинеты Терапевта/Хирурга.</p>
+      <p><b>11.7.</b> Проводят: ОК, старший и руководящий состав, сотрудники с квалификацией «Рекрутер».</p>
+      <p><b>11.8.</b> При приёме — трудовой договор и приложение (сотрудник ознакомлен с регламентом, подчиняется иерархии).</p>
+      <p><b>11.9.</b> После подписания — отписать кадровый аудит, организовать экскурсию и вводный инструктаж.</p>
+
+      <h3 id="u12">📕 Глава 12. Администрация, старший и руководящий состав</h3>
+      <p><b>12.1–12.2.</b> Старший состав помогает сотрудникам, контролирует работу организации, решает проблемы.</p>
+      <p><b>12.3.</b> АБ, старший и руководящий состав выдают взыскания; одобряют — старший состав АБ и руководящий. 12.3.1 — старший состав АБ выдаёт всем, кроме руководящего. 12.3.2 — средний состав АБ выдаёт младшему/среднему с одобрением Зав./З.З. АБ.</p>
+      <p><b>12.4.</b> Старший состав назначает собеседования и принимает на работу при отсутствии ОК.</p>
+      <p><b>12.5–12.6.</b> При увольнении — отписать кадровый аудит и проверить возврат медикаментов и спецсредств на склад.</p>
+      <p><b>12.7.</b> У старшего состава и инструкторов нет понятия «рабочая смена» — всегда на связи.</p>
+      <p><b>12.8–12.8.1.</b> Контроль чужого отдела при отсутствии его руководителей; регулярный контроль своего отдела (присутствие, дисциплина, помощь).</p>
+      <p><b>12.9.</b> ГВ/ЗГВ могут понизить несправляющегося сотрудника старшего состава; Зав. отделением понижает старший состав своего отдела.</p>
+      <p><b>12.10.</b> Выдача/снятие строгих выговоров отображается в планшете.</p>
+      <p><b>12.11.</b> Старшему составу и инструкторам запрещена халатность к обязанностям и документации.</p>
+      <p><b>12.12.</b> Взыскание нельзя выдать, если с нарушения прошло 48 часов; при проверке отчётности срок идёт с момента отправки отчёта.</p>
+      <p><b>12.13.</b> Старший состав обязан быть на рабочем месте в рабочее время в рабочей форме. | Строгий выговор</p>
+      <p><b>12.14.</b> Старший состав имеет все квалификации и вправе вести любую деятельность в рамках компетенции.</p>
+
+      <h3 id="u13">📕 Глава 13. Квалификации</h3>
+      <p><b>13.1.</b> «Хирург» — без ограничений по местам; без неё запрещено участвовать/проводить операции.</p>
+      <p><b>13.2.</b> «Терапевт» — без ограничений; без неё (и вне ПСЭС) запрещено выдавать медсправки. Искл.: старший/руководящий состав, ОК при трудоустройстве.</p>
+      <p><b>13.3.</b> «КМУ» (косметология и массаж) — 15 мест; без неё такие процедуры запрещены.</p>
+      <p><b>13.4.</b> Отказ/укрывательство от обязанностей специалиста наказуемо.</p>
+      <p><b>13.5.</b> «Рекрутер» — право проводить собеседования и трудоустройство.</p>
+      <p><b>13.6.</b> «Ветеринар» — 15 мест; без неё лечить животных запрещено. | Строгий выговор</p>
+
+      <h3 id="u14">📕 Глава 14. Премирование</h3>
+      <p><b>14.1–14.3.</b> Еженедельные списки на премирование; сумма зависит от должности, квалификации и отработанного времени.</p>
+      <p><b>14.4–14.5.</b> Доступ к премии — с Ординатора (5) при наличии недельного отчёта; без отчёта премии нет.</p>
+      <p><b>14.6.</b> С активным строгим выговором к премированию не допускаются (искл. — решение ГВ/ЗГВ).</p>
+      <p><b>14.7.</b> Решение принимает руководящий состав по качеству и объёму работы.</p>
+      <p><b>14.8.</b> Набравший наибольшее количество баллов может получить статус «Иммунитет» — снятие одного любого взыскания, действует неделю.</p>
+      <p class="muted" style="margin-top:14px">С уважением, Главный врач Больницы — Ангелина Быкова · опубликовано 22.08.2026, изменено 05.10.2026</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ПРАВИЛА ГОСУДАРСТВЕННЫХ ОРГАНИЗАЦИЙ ======================= -->
+<section class="tab-pane" id="tab-pgo">
+  <div class="ustav-wrap">
+    <div class="ustav-nav" id="pgoNav">
+      <a href="#p1">1 · Общее положение</a>
+      <a href="#p2">2 · Взаимодействие госорганизаций</a>
+      <a href="#p3">3 · Правительство</a>
+      <a href="#p4">4 · ФСБ</a>
+      <a href="#p5">5 · МВД</a>
+      <a href="#p6">6 · Армия</a>
+      <a href="#p7">7 · Силовые структуры</a>
+      <a href="#p8">8 · Судебная власть</a>
+      <a href="#p9">9 · Следственный комитет</a>
+      <a href="#p10">10 · ГИБДД</a>
+      <a href="#p11">11 · Вести Москвы</a>
+      <a href="#p12">12 · ФСО</a>
+      <a href="#p13">13 · РП допрос</a>
+      <a href="#p14">14 · Обыск багажников</a>
+    </div>
+    <div class="card ustav-body">
+      <p class="muted">🏛 Полный текст «Правил государственных организаций» с <a class="link" target="_blank" href="https://forum.russia.online/threads/pravila-gosudarstvennykh-organizatsii.11/">forum.russia.online</a> · опубликованы 05.08.2026. Выбирай раздел слева или прокручивай.</p>
+
+      <h3 id="p1">📕 Раздел 1. Общее положение</h3>
+      <p><b>1.1.</b> Сотрудник госструктуры — игрок, использующий склад, гардероб, автопарк фракции и/или выполняющий обязанности (министры, адвокаты и т.п.).</p>
+      <p><b>1.1.1.</b> Запрещены любые криминальные действия без написанной и одобренной РП-ситуации на форуме. | WARN / Ban / HardBan 3-15 дней</p>
+      <p><b>1.1.2.</b> Сумма взятки — не более 100.000 и только деньгами; больше — нужна одобренная криминальная РП-ситуация. | WARN</p>
+      <p><b>1.2.</b> Запрещено продавать/сливать госимущество и казну. | Demorgan 45-90 мин / Ban 3-30 дней / HardBan 7-30 / PermBan + аннулирование сделки</p>
+      <p><b>1.2.1.</b> Запрещено продавать или оставлять себе предметы, полученные после криминальных событий, — всё на склад/утилизацию как вещдоки. | Demorgan 35-90 мин / Ban 3-15 дней / HardBan до изъятия</p>
+      <p><b>1.2.2.</b> Предметы любой госструктуры хранить только на складе своей фракции, в её транспорте или у себя в инвентаре. | Demorgan 35-90 мин / Ban 3-30 дней + изъятие</p>
+      <p><b>1.3.</b> Запрещено изымать адвокатские/обычные лицензии без весомой IC-причины. | WARN / Ban 3-15 дней</p>
+      <p><b>1.4.</b> Запрещено намеренно затягивать процесс задержания. | Demorgan 60 мин / WARN</p>
+      <p><b>1.5.</b> Запрещено принимать во фракцию игроков с активным ЧС госорганизаций. | Demorgan 90 мин / WARN</p>
+      <p><b>1.6.</b> Изъятие нелегальных предметов — только через функционал сервера. | Demorgan 60 мин / WARN</p>
+      <p><b>1.7.</b> Срок КПЗ: до 10 минут за 1 звезду, максимум 50 минут за 5 звёзд. | HardBan 5-10 дней</p>
+      <p><b>1.8.</b> Права и нарушенные статьи озвучиваются в голосовой чат полностью, чётко и в умеренном темпе (при «Я не слышу» — отыгровка в текстовый чат). | Demorgan 50 мин / WARN / Ban 3-7 дней</p>
+      <p><b>1.9.</b> При просьбе задержанного вызвать адвоката право на защиту обязаны реализовать (приложение «Адвокаты» или «Контакты» → «Правительство») на территории КПЗ/допросной. | WARN</p>
+      <p><b>1.10.</b> Запрещено первым оскорблять, провоцировать, унижать задержанных и граждан. | Demorgan 100 мин / WARN / HardBan 5 дней</p>
+      <p><b>1.10.1.</b> В зелёных зонах (территории госорганизаций, места массового сбора) запрещено поведение, не соответствующее госслужащему. | WARN / Ban 2-5 дней / HardBan 5 дней</p>
+      <p><b>1.11.</b> Запрещена выдача/изъятие военных билетов без весомой IC-причины. | HardBan 15-30 дней / PermBan</p>
+      <p><b>1.12.</b> Премирование фракций и участников — только через функционал финансирования. | Выговор лидеру</p>
+      <p><b>1.13.</b> Запрещено повышать более чем на 1 ранг в сутки. | WARN / Ban 3 дня / Выговор лидеру + понижение</p>
+      <p><b>1.14.</b> Госслужащий может быть арестован/посажен в КПЗ только при выявлении нарушения прокурором, принявшим вызов (вызов — на территории КПЗ/допросной через «Контакты»). | Ban 7-15 дней / HardBan 7-10 дней</p>
+      <p><b>1.15.</b> Запрещено повышать игрока без отчёта о проделанной работе. | Ban 3-15 дней / HardBan 5-10 дней / Выговор лидеру + понижение</p>
+      <p><b>1.16.</b> Снять функциональный розыск может только выдавший его сотрудник. | WARN / Ban / HardBan 3-15 дней</p>
+      <p><b>1.17.</b> Запрещено изымать предметы у игрока без причин. | HardBan 15-30 дней / PermBan + обнуление аккаунта</p>
+      <p><b>1.18.</b> Запрещены вещи вне фракционного гардероба и нарушение внешнего вида (неестественный цвет волос, тату на лице/шее/кистях и т.п.). | Demorgan 60-90 мин / WARN. Искл.: работа под прикрытием</p>
+      <p><b>1.18.1.</b> Частные адвокаты на работе соблюдают официально-деловой стиль по п. 1.18. | Demorgan 35-90 мин / WARN</p>
+      <p><b>1.19.</b> Запрещено использовать фракционный склад вне фракционных мероприятий. | Ban 10-30 дней / HardBan 15-30 дней</p>
+      <p><b>1.20.</b> Запрещено злоупотребление функционалом: задержание за маску, 5 звёзд/максимальный срок за мелкое нарушение, необоснованная судимость, задержание внутри Больницы за функц. розыск, добивание звёзд за функц. розыск, массовые задержания в казино/на складах и т.п. | WARN / Ban 7-15 дней / HardBan 10-30 дней / PermBan</p>
+      <p><b>1.21.</b> Опознавательный знак = статический ID (#1234); носить надетым и видимым (МВД, ГИБДД). | Demorgan 60 мин</p>
+      <p><b>1.21.1.</b> Обязаны носить и предъявлять удостоверение по запросу участников RP-процесса. | Demorgan 60 мин. Искл.: Больница, Вести Москвы</p>
+      <p><b>1.21.2.</b> В планшете — находиться в том отделе, в котором находишься фактически. | Demorgan 45 мин</p>
+      <p><b>1.22.</b> Запрещено действовать вопреки постановлениям, искам, решениям прокурора и суда. | Ban 5-15 дней / HardBan 5-15 дней</p>
+      <p><b>1.22.1.</b> Прокурорам и судьям запрещено выносить заведомо неверные решения. | WARN / Ban 7-15 дней / HardBan 10-30 дней / PermBan</p>
+
+      <h3 id="p2">📕 Раздел 2. Взаимодействие государственных организаций</h3>
+      <p><b>2.1.</b> Следственный комитет руководит предварительным расследованием и вправе давать обязательные поручения МВД в рамках дела.</p>
+      <p><b>2.2.</b> МВД обеспечивает общественный порядок, содействует СК и ФСБ при спецмероприятиях.</p>
+      <p><b>2.3.</b> ГИБДД контролирует безопасность дорожного движения, материалы о преступлениях передаёт в МВД, СК или ФСБ по компетенции.</p>
+      <p><b>2.4.</b> ФСБ координирует борьбу с нарушениями федерального уровня и против госбезопасности, привлекая другие госорганизации.</p>
+      <p><b>2.5.</b> Армия привлекается только в случаях, предусмотренных законодательством сервера, либо по решению Правительства/Премьер-министра.</p>
+      <p><b>2.6.</b> Правительство руководит исполнительной властью, не вмешиваясь в расследования и оперативную деятельность.</p>
+      <p><b>2.7.</b> Внутренние инструкции, регламенты, отделы и услуги утверждаются Правительством и/или куратором фракции. | Выговор лидеру</p>
+      <p><b>2.8.</b> Перевод одобряется лидерами/заместителями обеих фракций (или Премьер-министром). | WARN / Выговор лидеру + увольнение игрока</p>
+      <p><b>2.9.</b> Запрещено повышать игрока с целью последующего перевода; после получения ранга перевод невозможен 7 дней. | WARN / Выговор лидеру + понижение на 1 ранг</p>
+      <p><b>2.10.</b> При переводе нельзя ставить ранг выше, чем был в предыдущей фракции. | WARN / Выговор лидеру + понижение</p>
+
+      <h3 id="p3">📕 Раздел 3. Правительство</h3>
+      <p><b>3.1.</b> Высший коллегиальный исполнительный орган. | Demorgan 15-90 мин / WARN / Выговор лидеру / Снятие. Задачи: проверки госорганизаций (не чаще 1 в неделю на одну), актуальность законодательной базы, расход казны в интересах государства, урезание премий при веской IC-причине, надзор не игнорирует нарушения госслужащих, постановления/указы публикуются на форуме (искл.: ордер на обыск транспорта), снятие ошибочного розыска, выдача адвокатских лицензий.</p>
+      <p><b>3.2.</b> Регистрация предприятий — не дороже 250.000. | Выговор лидеру</p>
+      <p><b>3.3.</b> Запрещена выдача адвокатских лицензий выше функциональной стоимости. | Demorgan 100 мин</p>
+
+      <h3 id="p4">📕 Раздел 4. ФСБ</h3>
+      <p><b>4.1.</b> Подчиняется министру юстиции и Премьер-министру.</p>
+      <p><b>4.2.</b> Федеральная правоохранительная структура: разведка, контрразведка, антитеррор. | Demorgan 10-90 мин / WARN / Выговор. Задачи: слежка за обработкой вызовов МВД/ГИБДД, кейс-файлы, нарушения федерального характера, помощь по запросу старшего состава МВД/ГИБДД, выявление коррупции, спецоперации.</p>
+
+      <h3 id="p5">📕 Раздел 5. МВД</h3>
+      <p><b>5.1.</b> Подчиняется старшему составу МВД, министерству внутренних дел и Премьер-министру.</p>
+      <p><b>5.2.</b> Региональная правоохранительная структура: порядок и безопасность муниципалитетов. | Demorgan 15-90 мин / Выговор лидеру. Задачи: охрана порядка, патрулирование, вызовы, задержания, оперативно-розыскные мероприятия, поручения СК, конвоирование, охрана мест происшествий. При отсутствии лидера ФСБ — разрешена отработка федеральной юрисдикции.</p>
+      <p><b>5.3.</b> Обращения граждан обрабатываются не позднее 48 часов. | Выговор лидеру</p>
+
+      <h3 id="p6">📕 Раздел 6. Армия</h3>
+      <p><b>6.1.</b> Задачи: защита военных объектов, охрана складов вооружения, военная подготовка, ЧС/военное положение, госмероприятия по распоряжению Правительства, помощь силовикам.</p>
+      <p><b>6.2.</b> Задерживать граждан можно только на территории Форта или около него (или за нарушения против сотрудников армии) с передачей ФСБ/МВД. | Demorgan 50-90 мин / WARN. Искл.: военные преступления, военное положение, ЧС</p>
+      <p><b>6.3.</b> Территория армии начинается после КПП; до КПП — свободное посещение.</p>
+      <p><b>6.4.</b> Подчиняется министерству обороны, старшему составу армии и Премьер-министру.</p>
+
+      <h3 id="p7">📕 Раздел 7. Общее положение силовых структур</h3>
+      <p><b>7.1.</b> Силовики — сотрудники ГИБДД, МВД, армии, ФСБ.</p>
+      <p><b>7.2.</b> Запрещено задерживать игрока, убитого при задержании и находящегося в больнице. | WARN</p>
+      <p><b>7.3.</b> Патрулирование, задержания и выезды — только на фракционном транспорте. | Demorgan 45 мин. Искл.: следователи (личный транспорт для сбора информации, без перестрелок и задержаний) и переговорщики</p>
+      <p><b>7.3.1.</b> На ограбления (бизнес, банк и т.п.) выезжать не менее чем вдвоём. | Demorgan 45 мин. Искл.: следователи, переговорщики</p>
+      <p><b>7.4.</b> При задержании, дистанционном розыске, аресте, изъятии лицензий, обыске, ордере на арест, работе по похищениям/ограблениям — обязательна видеозапись причины и всего процесса, хранение 48 часов, предоставление администрации не позднее 24 часов с запроса. Цельное видео от 480p с оригинальным звуком. | Demorgan 100 мин / WARN / Ban 10-15 дней / HardBan 15-30 дней / PermBan + обнуление</p>
+      <p><b>7.5.</b> Запрещено находиться на территории криминальной организации. | Demorgan 90 мин / WARN. Искл.: рейд, работа под прикрытием, военное положение, ответный заход в течение 15 минут после открытия огня по сотрудникам (ФСБ/МВД/Армия — от 10 человек на титульном районе ОПГ)</p>
+
+      <h3 id="p8">📕 Раздел 8. Судебная власть</h3>
+      <p><b>8.1.</b> Лидер судебной ветви назначается главным следящим за госструктурами.</p>
+      <p><b>8.2 / 8.2.1.</b> Председатель верховного суда — главный судебный орган, может наказывать всех, включая лидеров и верховных судей; в подчинении не более 3 верховных судей.</p>
+      <p><b>8.3.</b> Решение председателя обжалуется IC-иском к кураторам Правительства или гл. следящему.</p>
+      <p><b>8.4–8.4.4.</b> Снятие председателя — через кейс-файл гл. следящему. За неверное решение — 1 штрафной балл; 5 баллов = снятие. Балл снимается гл. следящим/ЗГА/ГА не чаще 1 раза в 5 дней. Председатель может быть снят лидером Правительства с одобрения главного куратора.</p>
+      <p><b>8.5.</b> По решению верховного судьи лидер госорганизации может быть снят (иск, грубые нарушения IC-законов, одобрение гл. следящего). | WARN / Выговор</p>
+      <p><b>8.6.</b> Все судебные процессы — в здании правительства.</p>
+      <p><b>8.7–8.7.4.</b> Принятие обращения — до 48 ч; начало расследования — до 48 ч; ходатайства — до 48 ч; исполнение судебных актов — до 72 ч; мотивированное решение по иску — до 48 ч. | Предупреждение / Выговор. При апелляции/кассации сроки исполнения приостанавливаются.</p>
+
+      <h3 id="p9">📕 Раздел 9. Следственный комитет</h3>
+      <p><b>9.1.</b> Лидер СК назначается администрацией сервера.</p>
+      <p><b>9.2.</b> Задачи: расследование подследственных преступлений, возбуждение дел, следственные действия, сбор доказательств, предъявление обвинения, передача дела в суд.</p>
+      <p><b>9.3.</b> Следственные действия — только при законных основаниях. | WARN / Ban 3-7 дней</p>
+      <p><b>9.4.</b> Запрещено возбуждать дела и предъявлять обвинения без достаточных доказательств или на предположениях.</p>
+      <p><b>9.5.</b> У лидера СК — бальная штрафная система (как у судей).</p>
+      <p><b>9.6.</b> Взаимодействие с МВД, ГИБДД, прокуратурой — только после запроса.</p>
+      <p><b>9.7.</b> Запрещено участвовать в патрулировании, рейдах и мероприятиях вне компетенции (искл.: совместные мероприятия). | Demorgan 100 мин / Ban 5-7 дней</p>
+      <p><b>9.8.</b> Процессуальные решения объективны и беспристрастны; запрещены злоупотребления, фабрикация доказательств, давление. | WARN / Ban 7-15 дней / HardBan 10-30 дней / PermBan</p>
+      <p><b>9.9.</b> Поступающие документы принимаются в работу в течение 48 часов. | Выговор лидеру</p>
+
+      <h3 id="p10">📕 Раздел 10. ГИБДД</h3>
+      <p><b>10.1.</b> Задачи: контроль ПДД, оформление ДТП, регулирование движения, проверка документов, профилактические мероприятия, розыск ТС по ориентировкам, сопровождение колонн.</p>
+      <p><b>10.2.</b> Подчиняется старшему составу ГИБДД, руководству МВД и Правительству.</p>
+      <p><b>10.3.</b> Инспектор действует вежливо, беспристрастно и в рамках полномочий.</p>
+      <p><b>10.4.</b> Остановка ТС — при законных основаниях, спецмероприятиях или ориентировках. | Demorgan 60-100 мин</p>
+      <p><b>10.5.</b> Задержание при признаках преступления с обязательной передачей компетентным органам. | Demorgan 45 мин</p>
+      <p><b>10.6.</b> Запрещено использовать служебный транспорт и полномочия в личных целях, необоснованные проверки. | Demorgan 60-100 мин</p>
+
+      <h3 id="p11">📕 Раздел 11. Вести Москвы</h3>
+      <p><b>11.1.</b> Свободное новостное агентство, подчиняется правительству и министерству культуры.</p>
+      <p><b>11.2.</b> Обязаны проверять, редактировать и обрабатывать функциональные объявления граждан. | Беседа / Выговор лидеру</p>
+      <p><b>11.3.</b> Запрещена подача объявлений/новостей в обход функционала. | WARN. Искл.: РП-ситуация, теракт, доплата за срочность, долгосрочные контракты, наборы во фракцию</p>
+      <p><b>11.4.</b> Объявления/новости должны носить всеобщий характер (запрещены приветы, поздравления конкретным игрокам). | Demorgan 15-35 мин</p>
+      <p><b>11.5.</b> Подача не должна содержать оскорблений и нарушать правила проекта. | По регламенту правил проекта</p>
+      <p><b>11.6.</b> Задерживать можно только на территории зелёной зоны Вестей с передачей силовикам; не передан за 15 минут — задержание прекращается. | Demorgan 60-100 мин / WARN</p>
+
+      <h3 id="p12">📕 Раздел 12. ФСО</h3>
+      <p><b>12.1.</b> Обеспечение безопасности и госохраны высших должностных лиц, подчиняется Правительству.</p>
+      <p><b>12.2.</b> Задачи: личная безопасность охраняемых лиц (Президент, Правительство и иные лица по законодательству), охрана особо важных гособъектов, безопасность официальных мероприятий, подготовка маршрута, сопровождение, взаимодействие с ФСБ/МВД/ГИБДД/СК/Армией.</p>
+      <p><b>12.3.</b> Запрещено игнорировать запросы на сопровождение. | Demorgan 15-60 мин</p>
+      <p><b>12.4.</b> Машин при сопровождении: минимум 2, максимум 10. | Demorgan 15-35 мин</p>
+      <p><b>12.5.</b> Руководящему составу правительства запрещено выезжать без сопровождения ФСО. | Demorgan 20-45 мин</p>
+
+      <h3 id="p13">📕 Раздел 13. Правила проведения РП допроса</h3>
+      <p><b>13.1.</b> Допрос должен иметь веские IC-основания (задержания после ограблений, похищений, терактов, госпереворота и т.п.). | WARN. Искл.: допрос в рамках иска, обращения в прокуратуру, судебного заседания, уголовного делопроизводства</p>
+      <p><b>13.1.1.</b> Допрос — только в присутствии следователя. | WARN / Ban 2-5 дней. Искл.: допросы, не относящиеся к уголовным правонарушениям</p>
+      <p><b>13.2.</b> Допрашиваемому запрещено нарушать правила PG (постепенная дача информации — не PG). | Demorgan 35-100 мин / Ban 2-5 дней</p>
+      <p><b>13.3.</b> Допрашиваемый не обязан чётко отвечать на вопросы о ранге/влиянии в криминальной организации и прямые вопросы о криминальной деятельности фракции — ответ обязан поступить, но может быть размытым.</p>
+      <p><b>13.3.1.</b> Запрещены некорректные вопросы в /do («Состоит ли игрок в криминальной фракции?» и т.п.). | WARN</p>
+      <p><b>13.4.</b> Допрос без грубого насилия, запрещены телесные повреждения. | WARN. Искл.: одобренная криминальная РП-ситуация; р. 1 п. 10.1</p>
+      <p><b>13.4.1.</b> Допрос без одобренной РП-ситуации (без применения силы) — только в допросной или интерьере фракции допрашивающего. | WARN</p>
+      <p><b>13.4.2.</b> Допрос с одобренной РП-ситуацией (с применением силы) — только вне зелёных зон и вне интерьера фракции допрашиваемого. | WARN</p>
+      <p><b>13.5.</b> Допрос — не более 60 минут. | Demorgan 35-90 мин всем участникам со стороны госфракции</p>
+      <p><b>13.6.</b> Запрещено намеренно затягивать RP-допрос (бесполезные вопросы, диалоги без смысловой нагрузки). | WARN</p>
+
+      <h3 id="p14">📕 Раздел 14. Правила обыска багажников транспортных средств</h3>
+      <p><b>14.1.</b> Выдача ордера на обыск настраивается лидером фракции; за массовые нарушения — выговор/снятие лидера.</p>
+      <p><b>14.1.1.</b> Основания ордера: массовые беспорядки, рост оборота незаконного оружия, военное положение, решение суда/прокурора, рейд и т.п.</p>
+      <p><b>14.1.2.</b> Ордер действует только на ТС из кейс-файла/делопроизводства/судебного иска/нарушения.</p>
+      <p><b>14.2.</b> При обычном патрулировании обыск ТС — только за нарушение УК. Искл.: п. 14.1.2 и 14.3</p>
+      <p><b>14.3.</b> При ограблении бизнеса/банка/дома можно осмотреть все близстоящие ТС.</p>
+      <p><b>14.4.</b> При использовании ордера — обязательный видеоматериал, хранение 48 часов, предоставление администрации (р. 7, п. 4).</p>
+
+      <p class="muted" style="margin-top:14px">Источник: Команда проекта Россия Онлайн · опубликовано 05.08.2026, последняя редакция — среда, 13:09</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>🚑 Помощник инструктора СМП · собрано из официальных каналов отдела и форума forum.russia.online · актуально на 06.10.2026<br>Разработчик: <b>Ермак Никита #52245</b> ❤️ · на базе калькулятора Феликса Некрасова #7319 · редакция старшего состава СМП</footer>
+<div class="toast" id="toast">Скопировано!</div>
+<script>
+/* ---------- Тема день/ночь ---------- */
+const root=document.documentElement, themeBtn=document.getElementById('themeBtn');
+function setTheme(t){root.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'☀️ День':'🌙 Ночь';localStorage.setItem('smp-theme',t);}
+setTheme(localStorage.getItem('smp-theme')||'dark');
+themeBtn.onclick=()=>setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');
+
+/* ---------- Вкладки ---------- */
+document.querySelectorAll('.tab-btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById('tab-'+b.dataset.tab).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+/* ---------- Часы и смена ---------- */
+function tick(){
+  const n=new Date(), hh=String(n.getHours()).padStart(2,'0'), mm=String(n.getMinutes()).padStart(2,'0'), ss=String(n.getSeconds()).padStart(2,'0');
+  document.getElementById('clockTime').textContent=hh+':'+mm+':'+ss;
+  const h=n.getHours(), day=n.getDay(), badge=document.getElementById('shiftBadge');
+  const lunchStart=14, lunchEnd=15;
+  const dayStart=(day===0||day===6)?11:10;
+  if(h>=lunchStart&&h<lunchEnd){badge.className='lunch';badge.textContent='🍽 Обед · баллы ×2';}
+  else if(h>=dayStart&&h<22){badge.className='day';badge.textContent='☀️ Дневная смена';}
+  else{badge.className='night';badge.textContent='🌙 Ночная смена';}
+}
+tick(); setInterval(tick,1000);
+
+/* ---------- Калькулятор ---------- */
+const inputs=[...document.querySelectorAll('#tab-calc input[data-pts]')];
+let curSub=0;
+const RANKS=[
+  {pmp:40,vak:0,pts:0,label:'3 → 4',exam:'🎤 Устный экзамен: ПМП + Вакцинация · 📍 Вступительный тест (16/20)'},
+  {pmp:50,vak:5,pts:200,label:'4 → 5',exam:'🎤 Устный экзамен: Фармакология и токсикология'},
+  {pmp:60,vak:10,pts:300,label:'5 → 6',exam:'🎤 Устный экзамен: Особо опасные инфекции'},
+  {pmp:70,vak:15,pts:400,label:'6 → 7',exam:'🎤 Устный экзамен: Реаниматология'},
+  {pmp:80,vak:20,pts:500,label:'7 → 8',exam:'🎤 Устный экзамен: Неврология'},
+  {pmp:100,vak:25,pts:600,label:'8 → 9',exam:'🎤 Устный экзамен: Травматология'}
+];
+function val(id){const el=document.getElementById(id);const v=parseInt(el.value.replace(/\D/g,''))||0;return v;}
+function calc(){
+  let base=0, inst=0;
+  inputs.forEach(i=>{const v=parseInt(i.value.replace(/\D/g,''))||0;const p=v*(+i.dataset.pts);base+=p;if(i.dataset.inst)inst+=p;});
+  curSub=subTotal();
+  const total=base+curSub;
+  document.getElementById('totalPts').textContent=total+' 🏅';
+  document.getElementById('instPts').textContent='👨‍🏫 из них инструкторских: '+inst;
+  const norm=+document.getElementById('normSel').value;
+  const pct=Math.min(100,Math.round(total/norm*100));
+  document.getElementById('normBar').style.width=pct+'%';
+  const left=Math.max(0,norm-total);
+  document.getElementById('normText').innerHTML=left===0?'✅ <b style="color:var(--good)">Норма выполнена! ('+pct+'%)</b>':'До нормы: <b>'+left+'</b> баллов ('+pct+'%)';
+  document.getElementById('instWarn').innerHTML=(norm===400)?(inst>=200?'✅ Инструкторской работы достаточно ('+inst+'/200)':'⚠️ Инструкторской работы: '+inst+'/200 — нужно ещё '+(200-inst)):'';
+  rankCheck(total);
+}
+function rankCheck(total){
+  const r=RANKS[+document.getElementById('rankSel').value];
+  const pmp=val('c_pmpD')+val('c_pmpN');
+  const vak=val('c_vak1')+val('c_vak2')+val('c_vakA');
+  const row=(ok,name,have,need)=>`<div>${ok?'<span class="req-ok">✅</span>':'<span class="req-no">❌</span>'} ${name}: <b>${have}</b> / ${need}</div>`;
+  let html=`<div style="font-weight:800;margin-bottom:4px">⬆️ Повышение ${r.label}</div>`;
+  html+=row(pmp>=r.pmp,'🚑 ПМП (день+ночь)',pmp,r.pmp);
+  if(r.vak>0)html+=row(vak>=r.vak,'💉 Вакцины',vak,r.vak);
+  if(r.pts>0)html+=row(total>=r.pts,'🏅 Баллы',total,r.pts);
+  html+=`<div class="muted" style="margin-top:6px">${r.exam}</div>`;
+  document.getElementById('rankCheck').innerHTML=html;
+}
+inputs.forEach(i=>{
+  i.addEventListener('input',()=>{i.value=i.value.replace(/\D/g,'').slice(0,4)||'0';calc();});
+  const wrap=i.closest('.stepper');
+  wrap.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    let v=(parseInt(i.value)||0)+(+b.dataset.d); if(v<0)v=0; i.value=v; calc();
+  });
+});
+document.getElementById('normSel').onchange=calc;
+document.getElementById('rankSel').onchange=calc;
+document.getElementById('resetCalc').onclick=()=>{inputs.forEach(i=>i.value=0);document.querySelectorAll('.sub-row input').forEach(i=>i.value=0);calc();};
+calc();
+
+/* ---------- Чек-лист проверки отчёта ---------- */
+const CHK=[
+ '🖥 Скриншоты полноэкранные, со статиком и сервером',
+ '🕐 Видны дата и время на каждом скрине',
+ '🎥 Плашка бодикамеры с красным индикатором',
+ '👔 Дресс-код соответствует отделу и рангу',
+ '🔗 Ссылки с разрешённого фотохостинга (не imgur/yapix/ru.files/ibb)',
+ '🔢 Количество скринов указано в скобках ( )',
+ '📂 Содержимое ссылок соответствует названию графы',
+ '🚑 ПМП в больнице — отдельной строкой, не в норме ПМП',
+ '🍽 Работа в обед — в «Доп. баллы» отдельной папкой',
+ '🔄 Замены не более 50% и указано что на что',
+ '🕵️ Нет признаков фиктивной деятельности (п. 4.14)',
+ '📊 Баллы посчитаны верно по системе баллов',
+ '📅 Работа выполнена после предыдущего отчёта',
+ '✍️ Пустые графы оставлены пустыми (без «-» и «0»)'
+];
+const chkWrap=document.getElementById('checklist');
+CHK.forEach((t,i)=>{
+  const l=document.createElement('label');l.className='chk';
+  l.innerHTML='<input type="checkbox"><span>'+t+'</span>';
+  l.querySelector('input').onchange=e=>l.classList.toggle('done',e.target.checked);
+  chkWrap.appendChild(l);
+});
+document.getElementById('resetChk').onclick=()=>chkWrap.querySelectorAll('input').forEach(c=>{c.checked=false;c.closest('.chk').classList.remove('done');});
+
+/* ---------- Вещания ---------- */
+const VESH=[
+ ['10:00','Доброе утро. Не забывайте включить бодикамеру. Скриншоты без включенной бодикамеры в отчетность не принимаются.'],
+ ['11:00','Дежурство в больницах также является важной частью нашей работы, пожалуйста распределитесь по больницам.'],
+ ['12:00','По всем интересующим вас вопросам вы можете обратиться к инструкторам или заместителям отдела в личные сообщения спецсвязи.'],
+ ['13:00','Пожалуйста, проверяйте свои укладки на количество и комплектность медикаментов. В случае если у вас не оказалось эпинефрина на месте вызова - вызовите 103 с телефона и дождитесь сотрудника больницы.'],
+ ['14:00','Настало время обеденного перерыва. Напоминаю, что работа в обеденный перерыв с 14:00 до 15:00 учитывается в двойном размере по системе баллов.'],
+ ['15:00','Обед завершен. Продолжаем работу. Не забывайте парковать АСМП в отведенных для этого местах.'],
+ ['16:00','Будьте осторожны на ПМП. При угрозе жизни или при перестрелке на месте происшествия немедленно уезжаем.'],
+ ['17:00','По прибытию на ПМП в первую очередь оказываем медицинскую помощь государственным служащим силовых структур на месте происшествия.'],
+ ['18:00','Не забывайте включать бодикамеры, находясь на рабочем месте. Скриншоты с выключенной бодикамерой в отчетность не принимаются.'],
+ ['19:00','По приезду на место вызова, где осуществляется перекрытие военной поставки и при наличии активной перестрелки категорически запрещено оказывать ПМП, в случае окончания перестрелки в первую очередь необходимо оказывать помощь исключительно государственным служащим.'],
+ ['20:00','Напоминаю, для сотрудников 7 ранга и выше введена активность - практика для сотрудников с должностью "Санитар", в рацию будут поступать запросы, вы на них реагируете, встречаетесь и вместе едете на ПМП, параллельно отвечаете на вопросы. Подробная информация имеется в спецсвязи.'],
+ ['21:00','Дежурство в больницах также является важной частью нашей работы, пожалуйста распределитесь по больницам.'],
+ ['22:00','Дневная смена завершена. Напоминаю, что в ночную смену вы получаете увеличенное количество баллов за ПМП. Ночная смена не является обязательной.']
+];
+const veshWrap=document.getElementById('veshList');
+VESH.forEach(([t,x])=>{
+  const d=document.createElement('div');d.className='vesh-row';
+  d.innerHTML='<div class="time">'+t+'</div><div class="txt">'+x+'</div>';
+  const b=document.createElement('button');b.className='copy-btn';b.textContent='📋';
+  b.onclick=()=>copyText(x);
+  d.appendChild(b);veshWrap.appendChild(d);
+});
+
+/* ---------- Копирование ---------- */
+function copyText(t){
+  navigator.clipboard.writeText(t).then(()=>{toast('📋 Скопировано!');}).catch(()=>{toast('Не удалось скопировать');});
+}
+document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>copyText(b.dataset.copy));
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+/* ---------- Поиск по шпаргалке ---------- */
+document.getElementById('examSearch').addEventListener('input',e=>{
+  const q=e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#tab-exam details').forEach(d=>{
+    const hit=!q||d.textContent.toLowerCase().includes(q);
+    d.style.display=hit?'':'none';
+    if(q&&hit)d.open=true;
+  });
+  document.querySelectorAll('#tab-exam .card.qa').forEach(c=>{
+    const any=[...c.querySelectorAll('details')].some(d=>d.style.display!=='none');
+    c.style.display=any?'':'none';
+  });
+});
+
+/* ---------- Кликабельный список экзаменов: якоря карточек ---------- */
+document.querySelectorAll('#tab-exam .card').forEach((c,i)=>c.id='ex'+i);
+
+/* ---------- Поиск по правилам ---------- */
+document.getElementById('rulesSearch').addEventListener('input',e=>{
+  const q=e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#tab-rules .rule-block').forEach(c=>{
+    c.style.display=(!q||c.textContent.toLowerCase().includes(q))?'':'none';
+  });
+});
+
+/* ---------- Шпаргалка: ответы открыты по умолчанию ---------- */
+document.querySelectorAll('#tab-exam details').forEach(d=>d.open=true);
+
+/* ---------- Калькулятор замен (по модели отдела) ---------- */
+function subTotal(){
+  let pts=0,toPmp=0,toVak=0;
+  document.querySelectorAll('.sub-row').forEach(r=>{
+    const inp=r.querySelector('input');
+    const q=parseInt(inp.value.replace(/\D/g,''))||0;
+    const got=Math.floor(q/(+r.dataset.rate));
+    pts+=got*3;
+    if(r.dataset.target==='pmp')toPmp+=got;else toVak+=got;
+    inp.closest('.calc-row').querySelector('.zres').textContent='→ '+got+' '+r.dataset.to+' ('+(got*3)+' б.)';
+  });
+  const actPmp=val('c_pmpD')+val('c_pmpN')+val('c_lunch');
+  const actVak=val('c_vak1')+val('c_vak2')+val('c_vakA');
+  const msg=(subs,act,name)=>{
+    if(act===0&&subs===0)return '';
+    if(subs>act)return '<div class="req-no">⛔ '+name+': замен '+subs+' больше выполненной работы '+act+' — лимит 50%! Максимум можно '+act+'.</div>';
+    return '<div><span class="req-ok">✅</span> '+name+': замен '+subs+' из макс. '+act+' (50%)'+(act>subs?' · можно ещё до '+(act-subs):'')+'</div>';
+  };
+  const w=document.getElementById('zamWarn');
+  w.innerHTML=(actPmp||toPmp)?msg(toPmp,actPmp,'🚑 ПМП'):'';
+  w.innerHTML+=(actVak||toVak)?msg(toVak,actVak,'💉 Вакцины'):'';
+  return pts;
+}
+document.querySelectorAll('.sub-row').forEach(r=>{
+  const i=r.querySelector('input');
+  i.addEventListener('input',()=>{i.value=i.value.replace(/\D/g,'').slice(0,4)||'0';calc();});
+  r.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    let v=(parseInt(i.value)||0)+(+b.dataset.d); if(v<0)v=0; i.value=v; calc();
+  });
+});
+
+/* ---------- Копирование итога расчёта ---------- */
+document.getElementById('copyRes').onclick=()=>{
+  const lines=['🚑 СМП · расчёт баллов',''];
+  inputs.forEach(i=>{
+    const v=parseInt(i.value)||0;
+    if(v>0){const l=i.closest('.calc-row').querySelector('label').textContent.trim();
+      lines.push(l+' — '+v+' × '+i.dataset.pts+' = '+(v*(+i.dataset.pts))+' б.');}
+  });
+  document.querySelectorAll('.sub-row').forEach(r=>{
+    const q=parseInt(r.querySelector('input').value)||0;
+    if(q>0){const got=Math.floor(q/(+r.dataset.rate));
+      lines.push('🔄 Замена: '+r.dataset.from+' '+q+' → '+r.dataset.to+' '+got+' = '+(got*3)+' б.');}
+  });
+  lines.push('','🏅 ИТОГО: '+document.getElementById('totalPts').textContent.replace(' 🏅','')+' баллов');
+  copyText(lines.join('\n'));
+};
+
+/* ---------- Кликабельные ссылки на главы устава ---------- */
+document.querySelectorAll('.uref').forEach(el=>el.onclick=()=>{
+  const id=el.dataset.u;
+  document.querySelector('.tab-btn[data-tab="ustav"]').click();
+  setTimeout(()=>{
+    const t=document.getElementById(id);
+    if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+  },80);
+});
+
+/* ---------- Подсветка активной главы (устав и ПГО) ---------- */
+function navSpy(navId,tabId){
+  const links=[...document.querySelectorAll('#'+navId+' a')];
+  if(!links.length)return;
+  const heads=[...document.querySelectorAll('#tab-'+tabId+' .ustav-body h3')];
+  window.addEventListener('scroll',()=>{
+    if(!document.getElementById('tab-'+tabId).classList.contains('active'))return;
+    let cur=0;
+    heads.forEach((h,i)=>{if(h.getBoundingClientRect().top<200)cur=i;});
+    links.forEach((a,i)=>a.classList.toggle('active',i===cur));
+  },{passive:true});
+  links.forEach(a=>a.onclick=()=>{links.forEach(x=>x.classList.remove('active'));a.classList.add('active');});
+}
+navSpy('ustavNav','ustav');
+navSpy('pgoNav','pgo');
+</script>
+</body>
+</html>
